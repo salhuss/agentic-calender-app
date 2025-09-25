@@ -1,0 +1,260 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+# Concurrency group to cancel previous runs for the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "18"
+
+jobs:
+  # Backend tests and linting
+  backend:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: backend/pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -e ".[dev]"
+
+      - name: Run linting
+        run: |
+          cd backend
+          ruff check .
+          ruff format --check .
+          mypy app
+
+      - name: Run tests
+        run: |
+          cd backend
+          python -m pytest --cov=app --cov-report=xml --cov-report=term-missing
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./backend/coverage.xml
+          flags: backend
+          name: backend-coverage
+
+  # Frontend tests and linting
+  frontend:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run linting
+        run: |
+          cd frontend
+          npm run lint
+          npm run type-check
+          npx prettier --check .
+
+      - name: Run tests
+        run: |
+          cd frontend
+          npm run test:coverage
+
+      - name: Build application
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./frontend/coverage/coverage-final.json
+          flags: frontend
+          name: frontend-coverage
+
+      - name: Upload build artifacts
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-build
+          path: frontend/dist
+          retention-days: 7
+
+  # End-to-end tests
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and start services
+        run: |
+          docker-compose up -d --build
+
+      - name: Wait for services to be ready
+        run: |
+          # Wait for backend to be healthy
+          timeout 60 bash -c 'until docker-compose exec -T backend python -c "import requests; requests.get(\"http://localhost:8000/healthz\")" 2>/dev/null; do sleep 2; done'
+
+          # Wait for frontend to be accessible
+          timeout 60 bash -c 'until curl -f http://localhost:5173 >/dev/null 2>&1; do sleep 2; done'
+
+      - name: Set up Node.js for Playwright
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Install Playwright browsers
+        run: |
+          cd frontend
+          npx playwright install --with-deps
+
+      - name: Run E2E tests
+        run: |
+          cd frontend
+          npx playwright test
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 30
+
+      - name: Stop services
+        if: always()
+        run: docker-compose down -v
+
+  # Build production images (only on main branch)
+  build-images:
+    name: Build Production Images
+    runs-on: ubuntu-latest
+    needs: [backend, frontend, e2e]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend image
+        run: |
+          docker build -t calendar-backend:latest --target production ./backend
+
+      - name: Build frontend image
+        run: |
+          docker build -t calendar-frontend:latest --target production ./frontend
+
+      - name: Test production build
+        run: |
+          docker-compose -f docker-compose.prod.yml up -d --build
+
+          # Wait for services
+          timeout 60 bash -c 'until curl -f http://localhost:8000/healthz >/dev/null 2>&1; do sleep 2; done'
+          timeout 60 bash -c 'until curl -f http://localhost >/dev/null 2>&1; do sleep 2; done'
+
+          # Cleanup
+          docker-compose -f docker-compose.prod.yml down
+
+      - name: Save Docker images
+        if: success()
+        run: |
+          docker save calendar-backend:latest | gzip > backend-image.tar.gz
+          docker save calendar-frontend:latest | gzip > frontend-image.tar.gz
+
+      - name: Upload Docker images
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-images
+          path: |
+            backend-image.tar.gz
+            frontend-image.tar.gz
+          retention-days: 7
+
+  # Check for security vulnerabilities
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Deployment (placeholder - would be customized for actual deployment)
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build-images]
+    if: github.ref == 'refs/heads/main'
+    environment: staging
+
+    steps:
+      - name: Placeholder deployment step
+        run: |
+          echo "This would deploy to staging environment"
+          echo "Docker images are available in artifacts"
+          echo "In a real scenario, this would:"
+          echo "1. Download the Docker images"
+          echo "2. Push them to a container registry"
+          echo "3. Deploy to staging environment"
+          echo "4. Run smoke tests"
