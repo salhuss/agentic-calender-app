@@ -189,38 +189,78 @@ async def get_event(event_id: int):
     conn.close()
     return Event(**event_dict)
 
-# Simple AI draft endpoint
+# LLM-powered AI draft endpoint
 @app.post("/api/v1/events/draft")
 async def create_event_draft(prompt_data: dict):
     prompt = prompt_data.get("prompt", "")
 
-    # Very simple AI logic
-    import re
+    if not prompt:
+        return {
+            "title": "New Event",
+            "description": "",
+            "start_datetime": None,
+            "end_datetime": None,
+            "all_day": False,
+            "location": None,
+            "attendees": [],
+            "confidence": 0.0,
+            "extracted_entities": {"error": "No prompt provided"}
+        }
 
-    title = "New Event"
-    if "meeting" in prompt.lower():
-        title = "Meeting"
-    elif "lunch" in prompt.lower():
-        title = "Lunch"
-    elif "call" in prompt.lower():
-        title = "Call"
+    # Use LLM-powered extraction
+    try:
+        from llm_event_extractor import LLMEventExtractor
 
-    # Extract people
-    with_match = re.search(r'with\s+(\w+)', prompt, re.IGNORECASE)
-    if with_match:
-        title += f" with {with_match.group(1)}"
+        extractor = LLMEventExtractor()
+        result = extractor.extract_event_data(prompt)
 
-    return {
-        "title": title,
-        "description": prompt,
-        "start_datetime": None,
-        "end_datetime": None,
-        "all_day": False,
-        "location": None,
-        "attendees": [],
-        "confidence": 0.7,
-        "extracted_entities": {"prompt": prompt}
-    }
+        return {
+            "title": result.title,
+            "description": result.description,
+            "start_datetime": result.start_datetime,
+            "end_datetime": result.end_datetime,
+            "all_day": result.all_day,
+            "location": result.location,
+            "attendees": result.attendees,
+            "confidence": result.confidence,
+            "extracted_entities": {
+                "prompt": prompt,
+                "reasoning": result.reasoning,
+                "extraction_method": "llm" if result.confidence > 0.5 else "rule-based"
+            }
+        }
+    except Exception as e:
+        # Fallback to simple rule-based extraction on any error
+        import re
+
+        title = "New Event"
+        if "meeting" in prompt.lower():
+            title = "Meeting"
+        elif "lunch" in prompt.lower():
+            title = "Lunch"
+        elif "call" in prompt.lower():
+            title = "Call"
+
+        # Extract people
+        with_match = re.search(r'with\s+(\w+)', prompt, re.IGNORECASE)
+        if with_match:
+            title += f" with {with_match.group(1)}"
+
+        return {
+            "title": title,
+            "description": prompt,
+            "start_datetime": None,
+            "end_datetime": None,
+            "all_day": False,
+            "location": None,
+            "attendees": [],
+            "confidence": 0.3,
+            "extracted_entities": {
+                "prompt": prompt,
+                "error": str(e),
+                "extraction_method": "rule-based-fallback"
+            }
+        }
 
 if __name__ == "__main__":
     import uvicorn
