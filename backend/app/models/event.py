@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional
 
 from pydantic import field_validator, model_validator
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import JSON, UniqueConstraint
 from sqlmodel import Field, SQLModel
 
 from app.models.base import TimestampMixin
@@ -46,6 +46,9 @@ class Event(EventBase, TimestampMixin, table=True):
     __tablename__ = "events"
 
     id: Optional[int] = Field(default=None, primary_key=True)
+
+    # Override attendees field with proper JSON type for database
+    attendees: list[str] = Field(default_factory=list, sa_column_kwargs={"type_": JSON}, description="List of email addresses")
 
     # Add unique constraint to prevent identical duplicates (optional requirement)
     __table_args__ = (
