@@ -221,13 +221,17 @@ class AIService:
                         elif time_match[2].lower() == "am" and hour == 12:
                             hour = 0
 
-                    start_datetime = datetime.combine(base_date, datetime.min.time().replace(hour=hour, minute=minute))
+                    start_datetime = datetime.combine(
+                        base_date, datetime.min.time().replace(hour=hour, minute=minute)
+                    )
 
                     # Default 1-hour duration
                     end_datetime = start_datetime + timedelta(hours=1)
 
                     # Look for duration or end time in prompt
-                    duration_match = re.search(r"(\d+)\s*(?:hour|hr)", prompt, re.IGNORECASE)
+                    duration_match = re.search(
+                        r"(\d+)\s*(?:hour|hr)", prompt, re.IGNORECASE
+                    )
                     if duration_match:
                         duration_hours = int(duration_match.group(1))
                         end_datetime = start_datetime + timedelta(hours=duration_hours)
@@ -239,7 +243,9 @@ class AIService:
         if all_day or start_datetime is None:
             all_day = True
             start_datetime = datetime.combine(base_date, datetime.min.time())
-            end_datetime = datetime.combine(base_date, datetime.max.time().replace(microsecond=0))
+            end_datetime = datetime.combine(
+                base_date, datetime.max.time().replace(microsecond=0)
+            )
 
         return start_datetime, end_datetime, all_day
 
