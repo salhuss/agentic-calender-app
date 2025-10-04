@@ -39,8 +39,6 @@ const EventModal: React.FC<EventModalProps> = ({ event, defaultDate, onClose }) 
   // Set up form with default values
   const getDefaultValues = (): EventFormData => {
     if (event) {
-      const startDt = DateTime.fromISO(event.start_datetime);
-      const endDt = DateTime.fromISO(event.end_datetime);
 
       return {
         title: event.title,
@@ -72,7 +70,7 @@ const EventModal: React.FC<EventModalProps> = ({ event, defaultDate, onClose }) 
     }
   };
 
-  const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<EventFormData>({
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<EventFormData>({
     defaultValues: getDefaultValues(),
   });
 
