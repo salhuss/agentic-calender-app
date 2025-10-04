@@ -17,7 +17,9 @@ class EventBase(SQLModel):
     end_datetime: datetime
     all_day: bool = Field(default=False)
     location: str | None = Field(default=None, max_length=500)
-    attendees: list[str] = Field(default_factory=list, description="List of email addresses")
+    attendees: list[str] = Field(
+        default_factory=list, description="List of email addresses"
+    )
     original_timezone: str = Field(default="UTC", max_length=50)
 
     @field_validator("attendees")
@@ -47,7 +49,11 @@ class Event(EventBase, TimestampMixin, table=True):
     id: int | None = Field(default=None, primary_key=True)
 
     # Override attendees field with proper JSON type for database
-    attendees: list[str] = Field(default_factory=list, sa_column_kwargs={"type_": JSON}, description="List of email addresses")
+    attendees: list[str] = Field(
+        default_factory=list,
+        sa_column_kwargs={"type_": JSON},
+        description="List of email addresses"
+    )
 
     # Add unique constraint to prevent identical duplicates (optional requirement)
     __table_args__ = (
@@ -121,4 +127,7 @@ class EventDraft(SQLModel):
     location: str | None = None
     attendees: list[str] = Field(default_factory=list)
     confidence: float = Field(ge=0.0, le=1.0, description="AI confidence score")
-    extracted_entities: dict = Field(default_factory=dict, description="Raw extracted entities")
+    extracted_entities: dict = Field(
+        default_factory=dict,
+        description="Raw extracted entities"
+    )
