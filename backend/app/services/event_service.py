@@ -38,8 +38,8 @@ class EventService:
     async def get_event(session: AsyncSession, event_id: int) -> Event:
         """Get event by ID."""
         statement = select(Event).where(Event.id == event_id)
-        result = await session.exec(statement)
-        event = result.first()
+        result = await session.execute(statement)
+        event = result.scalars().first()
         if not event:
             raise NotFoundError(f"Event with id {event_id} not found")
         return event
@@ -57,7 +57,8 @@ class EventService:
         statement = select(Event)
 
         # Apply filters
-        filters = []
+        from sqlalchemy import ColumnElement
+        filters: list = []
 
         if from_date:
             filters.append(Event.start_datetime >= from_date)
@@ -67,9 +68,9 @@ class EventService:
 
         if query:
             search_filter = or_(
-                Event.title.ilike(f"%{query}%"),
-                Event.description.ilike(f"%{query}%"),
-                Event.location.ilike(f"%{query}%"),
+                Event.title.ilike(f"%{query}%"),  # type: ignore
+                Event.description.ilike(f"%{query}%"),  # type: ignore
+                Event.location.ilike(f"%{query}%"),  # type: ignore
             )
             filters.append(search_filter)
 
@@ -78,18 +79,18 @@ class EventService:
 
         # Get total count
         count_statement = select(func.count()).select_from(statement.subquery())
-        total_result = await session.exec(count_statement)
-        total = total_result.first() or 0
+        total_result = await session.execute(count_statement)
+        total = total_result.scalar() or 0
 
         # Apply pagination
         offset = (page - 1) * size
         statement = statement.offset(offset).limit(size)
 
         # Order by start date
-        statement = statement.order_by(Event.start_datetime)
+        statement = statement.order_by(Event.start_datetime)  # type: ignore
 
-        result = await session.exec(statement)
-        events = result.all()
+        result = await session.execute(statement)
+        events = list(result.scalars().all())
 
         return events, total
 
@@ -148,28 +149,20 @@ class EventService:
     ) -> None:
         """Check for overlapping all-day events."""
         statement = select(Event).where(
-            Event.all_day.is_(True),
+            Event.all_day == True,
             or_(
-                and_(
-                    Event.start_datetime <= start_datetime,
-                    Event.end_datetime > start_datetime,
-                ),
-                and_(
-                    Event.start_datetime < end_datetime,
-                    Event.end_datetime >= end_datetime,
-                ),
-                and_(
-                    Event.start_datetime >= start_datetime,
-                    Event.end_datetime <= end_datetime,
-                ),
+                # Type ignore needed for SQLAlchemy column comparisons
+                and_(Event.start_datetime <= start_datetime, Event.end_datetime > start_datetime),  # type: ignore
+                and_(Event.start_datetime < end_datetime, Event.end_datetime >= end_datetime),  # type: ignore
+                and_(Event.start_datetime >= start_datetime, Event.end_datetime <= end_datetime),  # type: ignore
             ),
         )
 
         if exclude_event_id:
             statement = statement.where(Event.id != exclude_event_id)
 
-        result = await session.exec(statement)
-        overlapping_event = result.first()
+        result = await session.execute(statement)
+        overlapping_event = result.scalars().first()
 
         if overlapping_event:
             raise ConflictError(

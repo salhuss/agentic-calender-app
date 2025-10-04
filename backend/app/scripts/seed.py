@@ -159,7 +159,8 @@ async def clear_data() -> None:
     print("Clearing existing data...")
     async with async_session_maker() as session:
         # Delete all events
-        result = await session.execute("DELETE FROM events")
+        from sqlmodel import delete
+        result = await session.execute(delete(Event))
         deleted_count = result.rowcount
         await session.commit()
         print(f"✅ Deleted {deleted_count} existing events")
@@ -168,7 +169,7 @@ async def clear_data() -> None:
 if __name__ == "__main__":
     import sys
 
-    async def main():
+    async def main() -> None:
         if len(sys.argv) > 1 and sys.argv[1] == "--clear":
             await clear_data()
             return

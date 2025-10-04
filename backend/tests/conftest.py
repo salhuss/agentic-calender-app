@@ -2,10 +2,11 @@
 
 import asyncio
 from collections.abc import AsyncGenerator, Generator
+from typing import Any, Dict
 
 import pytest
 from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlmodel import SQLModel
 
 from app.core.database import get_session
@@ -24,7 +25,7 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
 
 
 @pytest.fixture
-async def test_engine():
+async def test_engine() -> AsyncGenerator[AsyncEngine, None]:
     """Create a test database engine."""
     engine = create_async_engine(TEST_DATABASE_URL, echo=False)
 
@@ -37,14 +38,14 @@ async def test_engine():
 
 
 @pytest.fixture
-async def test_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
+async def test_session(test_engine: AsyncEngine) -> AsyncGenerator[AsyncSession, None]:
     """Create a test database session."""
     async with AsyncSession(test_engine) as session:
         yield session
 
 
 @pytest.fixture
-async def client(test_session) -> AsyncGenerator[AsyncClient, None]:
+async def client(test_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     """Create a test client with database session override."""
 
     async def override_get_session() -> AsyncGenerator[AsyncSession, None]:
@@ -52,14 +53,14 @@ async def client(test_session) -> AsyncGenerator[AsyncClient, None]:
 
     app.dependency_overrides[get_session] = override_get_session
 
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    async with AsyncClient(base_url="http://test") as ac:
         yield ac
 
     app.dependency_overrides.clear()
 
 
 @pytest.fixture
-def sample_event_data():
+def sample_event_data() -> Dict[str, Any]:
     """Sample event data for testing."""
     return {
         "title": "Test Event",

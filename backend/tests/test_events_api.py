@@ -1,11 +1,13 @@
 """Test events API endpoints."""
 
 import pytest
+from typing import Any, Dict
+
 from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
-async def test_create_event(client: AsyncClient, sample_event_data):
+async def test_create_event(client: AsyncClient, sample_event_data: Dict[str, Any]) -> None:
     """Test creating an event."""
     response = await client.post("/api/v1/events/", json=sample_event_data)
     assert response.status_code == 201
@@ -20,7 +22,7 @@ async def test_create_event(client: AsyncClient, sample_event_data):
 
 
 @pytest.mark.asyncio
-async def test_create_event_invalid_datetime(client: AsyncClient, sample_event_data):
+async def test_create_event_invalid_datetime(client: AsyncClient, sample_event_data: Dict[str, Any]) -> None:
     """Test creating an event with invalid datetime (end before start)."""
     invalid_data = sample_event_data.copy()
     invalid_data["start_datetime"] = "2023-12-01T12:00:00Z"
@@ -31,7 +33,7 @@ async def test_create_event_invalid_datetime(client: AsyncClient, sample_event_d
 
 
 @pytest.mark.asyncio
-async def test_get_event(client: AsyncClient, sample_event_data):
+async def test_get_event(client: AsyncClient, sample_event_data: Dict[str, Any]) -> None:
     """Test getting a specific event."""
     # Create event first
     create_response = await client.post("/api/v1/events/", json=sample_event_data)
@@ -47,14 +49,14 @@ async def test_get_event(client: AsyncClient, sample_event_data):
 
 
 @pytest.mark.asyncio
-async def test_get_nonexistent_event(client: AsyncClient):
+async def test_get_nonexistent_event(client: AsyncClient) -> None:
     """Test getting a non-existent event."""
     response = await client.get("/api/v1/events/999")
     assert response.status_code == 404
 
 
 @pytest.mark.asyncio
-async def test_list_events(client: AsyncClient, sample_event_data):
+async def test_list_events(client: AsyncClient, sample_event_data: Dict[str, Any]) -> None:
     """Test listing events."""
     # Create a few events
     for i in range(3):
@@ -77,7 +79,7 @@ async def test_list_events(client: AsyncClient, sample_event_data):
 
 
 @pytest.mark.asyncio
-async def test_list_events_with_query(client: AsyncClient, sample_event_data):
+async def test_list_events_with_query(client: AsyncClient, sample_event_data: Dict[str, Any]) -> None:
     """Test listing events with search query."""
     # Create events with different titles
     event1 = sample_event_data.copy()
@@ -98,7 +100,7 @@ async def test_list_events_with_query(client: AsyncClient, sample_event_data):
 
 
 @pytest.mark.asyncio
-async def test_update_event(client: AsyncClient, sample_event_data):
+async def test_update_event(client: AsyncClient, sample_event_data: Dict[str, Any]) -> None:
     """Test updating an event."""
     # Create event
     create_response = await client.post("/api/v1/events/", json=sample_event_data)
@@ -117,7 +119,7 @@ async def test_update_event(client: AsyncClient, sample_event_data):
 
 
 @pytest.mark.asyncio
-async def test_delete_event(client: AsyncClient, sample_event_data):
+async def test_delete_event(client: AsyncClient, sample_event_data: Dict[str, Any]) -> None:
     """Test deleting an event."""
     # Create event
     create_response = await client.post("/api/v1/events/", json=sample_event_data)
@@ -133,7 +135,7 @@ async def test_delete_event(client: AsyncClient, sample_event_data):
 
 
 @pytest.mark.asyncio
-async def test_all_day_event_overlap_prevention(client: AsyncClient):
+async def test_all_day_event_overlap_prevention(client: AsyncClient) -> None:
     """Test that overlapping all-day events are prevented."""
     # Create first all-day event
     event1 = {
@@ -157,7 +159,7 @@ async def test_all_day_event_overlap_prevention(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_timed_events_can_overlap(client: AsyncClient):
+async def test_timed_events_can_overlap(client: AsyncClient) -> None:
     """Test that timed events can overlap (as per requirements)."""
     # Create first timed event
     event1 = {
@@ -181,7 +183,7 @@ async def test_timed_events_can_overlap(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_create_event_draft(client: AsyncClient):
+async def test_create_event_draft(client: AsyncClient) -> None:
     """Test creating an event draft from natural language."""
     response = await client.post(
         "/api/v1/events/draft", json={"prompt": "Meeting with John tomorrow at 3pm"}

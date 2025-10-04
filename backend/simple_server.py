@@ -3,6 +3,7 @@
 import json
 import sqlite3
 from datetime import datetime
+from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -51,7 +52,7 @@ class EventListResponse(BaseModel):
 
 
 # Database setup
-def init_db():
+def init_db() -> None:
     conn = sqlite3.connect("data/simple_app.db")
     cursor = conn.cursor()
 
@@ -78,17 +79,17 @@ def init_db():
 
 
 @app.on_event("startup")
-async def startup_event():
+async def startup_event() -> None:
     init_db()
 
 
 @app.get("/healthz")
-async def health_check():
+async def health_check() -> dict[str, str]:
     return {"status": "healthy"}
 
 
 @app.get("/api/v1/events", response_model=EventListResponse)
-async def list_events(page: int = 1, size: int = 20):
+async def list_events(page: int = 1, size: int = 20) -> EventListResponse:
     conn = sqlite3.connect("data/simple_app.db")
     cursor = conn.cursor()
 
@@ -135,7 +136,7 @@ async def list_events(page: int = 1, size: int = 20):
 
 
 @app.post("/api/v1/events", response_model=Event, status_code=201)
-async def create_event(event_data: EventCreate):
+async def create_event(event_data: EventCreate) -> Event:
     now = datetime.utcnow().isoformat()
 
     conn = sqlite3.connect("data/simple_app.db")
@@ -168,7 +169,7 @@ async def create_event(event_data: EventCreate):
 
     # Return the created event
     return Event(
-        id=event_id,
+        id=int(event_id) if event_id else 0,
         title=event_data.title,
         description=event_data.description,
         start_datetime=event_data.start_datetime,
@@ -183,7 +184,7 @@ async def create_event(event_data: EventCreate):
 
 
 @app.get("/api/v1/events/{event_id}", response_model=Event)
-async def get_event(event_id: int):
+async def get_event(event_id: int) -> Event:
     conn = sqlite3.connect("data/simple_app.db")
     cursor = conn.cursor()
 
@@ -220,7 +221,7 @@ async def get_event(event_id: int):
 
 # LLM-powered AI draft endpoint
 @app.post("/api/v1/events/draft")
-async def create_event_draft(prompt_data: dict):
+async def create_event_draft(prompt_data: dict[str, str]) -> dict[str, Any]:
     prompt = prompt_data.get("prompt", "")
 
     if not prompt:

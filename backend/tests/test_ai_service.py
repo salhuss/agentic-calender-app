@@ -6,7 +6,7 @@ from app.services.ai_service import AIService
 
 
 @pytest.mark.asyncio
-async def test_generate_event_draft_with_time():
+async def test_generate_event_draft_with_time() -> None:
     """Test generating an event draft with time information."""
     prompt = "Meeting with John tomorrow at 3pm"
     draft = await AIService.generate_event_draft(prompt)
@@ -19,7 +19,7 @@ async def test_generate_event_draft_with_time():
 
 
 @pytest.mark.asyncio
-async def test_generate_event_draft_all_day():
+async def test_generate_event_draft_all_day() -> None:
     """Test generating an all-day event draft."""
     prompt = "Conference all day tomorrow"
     draft = await AIService.generate_event_draft(prompt)
@@ -29,7 +29,7 @@ async def test_generate_event_draft_all_day():
 
 
 @pytest.mark.asyncio
-async def test_generate_event_draft_with_location():
+async def test_generate_event_draft_with_location() -> None:
     """Test generating an event draft with location."""
     prompt = "Lunch at Cafe Rio tomorrow 12pm"
     draft = await AIService.generate_event_draft(prompt)
@@ -40,7 +40,7 @@ async def test_generate_event_draft_with_location():
 
 
 @pytest.mark.asyncio
-async def test_generate_event_draft_with_email():
+async def test_generate_event_draft_with_email() -> None:
     """Test generating an event draft with attendee emails."""
     prompt = "Meeting with john@example.com tomorrow at 2pm"
     draft = await AIService.generate_event_draft(prompt)
@@ -51,7 +51,7 @@ async def test_generate_event_draft_with_email():
 
 
 @pytest.mark.asyncio
-async def test_extract_entities():
+async def test_extract_entities() -> None:
     """Test entity extraction."""
     prompt = "Meeting with John at Cafe Rio tomorrow 3pm"
     entities = AIService._extract_entities(prompt)
@@ -64,13 +64,13 @@ async def test_extract_entities():
 
 
 @pytest.mark.asyncio
-async def test_calculate_confidence():
+async def test_calculate_confidence() -> None:
     """Test confidence calculation."""
     # High confidence - has title, datetime, location, attendees
     high_conf = AIService._calculate_confidence(
         title="Meeting with John",
-        start_datetime="2023-12-01T15:00:00Z",
-        end_datetime="2023-12-01T16:00:00Z",
+        start_datetime=None,
+        end_datetime=None,
         location="Cafe Rio",
         attendees=["john@example.com"],
     )
