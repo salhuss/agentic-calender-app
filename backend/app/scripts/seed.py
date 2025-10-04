@@ -25,8 +25,12 @@ async def seed_data() -> None:
             {
                 "title": "Team Standup",
                 "description": "Daily team standup meeting",
-                "start_datetime": datetime.utcnow() + timedelta(days=1, hours=9),
-                "end_datetime": datetime.utcnow() + timedelta(days=1, hours=9, minutes=30),
+                "start_datetime": datetime.utcnow() + timedelta(
+                    days=1, hours=9
+                ),
+                "end_datetime": datetime.utcnow() + timedelta(
+                    days=1, hours=9, minutes=30
+                ),
                 "all_day": False,
                 "location": "Conference Room A",
                 "attendees": ["alice@company.com", "bob@company.com"],
@@ -35,18 +39,27 @@ async def seed_data() -> None:
             {
                 "title": "Product Planning Meeting",
                 "description": "Quarterly product planning session",
-                "start_datetime": datetime.utcnow() + timedelta(days=2, hours=14),
-                "end_datetime": datetime.utcnow() + timedelta(days=2, hours=16),
+                "start_datetime": datetime.utcnow() + timedelta(
+                    days=2, hours=14
+                ),
+                "end_datetime": datetime.utcnow() + timedelta(
+                    days=2, hours=16
+                ),
                 "all_day": False,
                 "location": "Zoom Meeting Room",
-                "attendees": ["product@company.com", "engineering@company.com"],
+                "attendees": [
+                    "product@company.com",
+                    "engineering@company.com"
+                ],
                 "original_timezone": "UTC",
             },
             {
                 "title": "Company All-Hands",
                 "description": "Monthly company-wide meeting",
                 "start_datetime": datetime.utcnow() + timedelta(days=3),
-                "end_datetime": datetime.utcnow() + timedelta(days=3, hours=23, minutes=59, seconds=59),
+                "end_datetime": datetime.utcnow() + timedelta(
+                    days=3, hours=23, minutes=59, seconds=59
+                ),
                 "all_day": True,
                 "location": "Main Auditorium",
                 "attendees": [],
@@ -55,8 +68,12 @@ async def seed_data() -> None:
             {
                 "title": "Lunch with Client",
                 "description": "Business lunch with potential client",
-                "start_datetime": datetime.utcnow() + timedelta(days=4, hours=12),
-                "end_datetime": datetime.utcnow() + timedelta(days=4, hours=13, minutes=30),
+                "start_datetime": datetime.utcnow() + timedelta(
+                    days=4, hours=12
+                ),
+                "end_datetime": datetime.utcnow() + timedelta(
+                    days=4, hours=13, minutes=30
+                ),
                 "all_day": False,
                 "location": "Restaurant Downtown",
                 "attendees": ["client@example.com"],
@@ -65,8 +82,12 @@ async def seed_data() -> None:
             {
                 "title": "Code Review Session",
                 "description": "Weekly code review and knowledge sharing",
-                "start_datetime": datetime.utcnow() + timedelta(days=5, hours=15),
-                "end_datetime": datetime.utcnow() + timedelta(days=5, hours=16, minutes=30),
+                "start_datetime": datetime.utcnow() + timedelta(
+                    days=5, hours=15
+                ),
+                "end_datetime": datetime.utcnow() + timedelta(
+                    days=5, hours=16, minutes=30
+                ),
                 "all_day": False,
                 "location": "Development Office",
                 "attendees": ["dev-team@company.com"],
@@ -76,7 +97,9 @@ async def seed_data() -> None:
                 "title": "Weekend Hackathon",
                 "description": "Innovation hackathon event",
                 "start_datetime": datetime.utcnow() + timedelta(days=6),
-                "end_datetime": datetime.utcnow() + timedelta(days=8, hours=23, minutes=59, seconds=59),
+                "end_datetime": datetime.utcnow() + timedelta(
+                    days=8, hours=23, minutes=59, seconds=59
+                ),
                 "all_day": True,
                 "location": "Innovation Lab",
                 "attendees": ["all@company.com"],
@@ -85,8 +108,12 @@ async def seed_data() -> None:
             {
                 "title": "Project Kickoff",
                 "description": "New project kickoff meeting",
-                "start_datetime": datetime.utcnow() + timedelta(days=7, hours=10),
-                "end_datetime": datetime.utcnow() + timedelta(days=7, hours=12),
+                "start_datetime": datetime.utcnow() + timedelta(
+                    days=7, hours=10
+                ),
+                "end_datetime": datetime.utcnow() + timedelta(
+                    days=7, hours=12
+                ),
                 "all_day": False,
                 "location": "Project Room",
                 "attendees": ["project-team@company.com"],
@@ -95,18 +122,27 @@ async def seed_data() -> None:
             {
                 "title": "Workshop: AI in Calendar Apps",
                 "description": "Technical workshop on implementing AI features",
-                "start_datetime": datetime.utcnow() + timedelta(days=10, hours=13),
-                "end_datetime": datetime.utcnow() + timedelta(days=10, hours=17),
+                "start_datetime": datetime.utcnow() + timedelta(
+                    days=10, hours=13
+                ),
+                "end_datetime": datetime.utcnow() + timedelta(
+                    days=10, hours=17
+                ),
                 "all_day": False,
                 "location": "Training Center",
-                "attendees": ["engineering@company.com", "ai-team@company.com"],
+                "attendees": [
+                    "engineering@company.com",
+                    "ai-team@company.com"
+                ],
                 "original_timezone": "UTC",
             },
             {
                 "title": "Conference: TechCrunch Disrupt",
                 "description": "Attending TechCrunch Disrupt conference",
                 "start_datetime": datetime.utcnow() + timedelta(days=14),
-                "end_datetime": datetime.utcnow() + timedelta(days=16, hours=23, minutes=59, seconds=59),
+                "end_datetime": datetime.utcnow() + timedelta(
+                    days=16, hours=23, minutes=59, seconds=59
+                ),
                 "all_day": True,
                 "location": "San Francisco, CA",
                 "attendees": [],
@@ -115,8 +151,12 @@ async def seed_data() -> None:
             {
                 "title": "Team Building Activity",
                 "description": "Quarterly team building event",
-                "start_datetime": datetime.utcnow() + timedelta(days=21, hours=14),
-                "end_datetime": datetime.utcnow() + timedelta(days=21, hours=18),
+                "start_datetime": datetime.utcnow() + timedelta(
+                    days=21, hours=14
+                ),
+                "end_datetime": datetime.utcnow() + timedelta(
+                    days=21, hours=18
+                ),
                 "all_day": False,
                 "location": "Adventure Park",
                 "attendees": ["team@company.com"],
@@ -141,7 +181,10 @@ async def seed_data() -> None:
             print(f"  • {event_data['title']} ({event_type})")
 
         print("\n🎉 Database seeded successfully!")
-        print(f"You can now run the application and see {events_created} sample events.")
+        print(
+            f"You can now run the application and see {events_created} "
+            f"sample events."
+        )
 
 
 async def clear_data() -> None:
