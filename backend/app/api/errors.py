@@ -1,5 +1,5 @@
 """API error handling."""
-from typing import Any, Dict, Optional
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -9,7 +9,7 @@ class ErrorDetail(BaseModel):
 
     code: str
     message: str
-    fields: Optional[Dict[str, Any]] = None
+    fields: dict[str, Any] | None = None
 
 
 class APIError(Exception):
@@ -20,7 +20,7 @@ class APIError(Exception):
         code: str,
         message: str,
         status_code: int = 400,
-        fields: Optional[Dict[str, Any]] = None,
+        fields: dict[str, Any] | None = None,
     ) -> None:
         self.code = code
         self.message = message
@@ -32,7 +32,7 @@ class APIError(Exception):
 class ValidationError(APIError):
     """Validation error."""
 
-    def __init__(self, message: str, fields: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(self, message: str, fields: dict[str, Any] | None = None) -> None:
         super().__init__(
             code="VALIDATION_ERROR",
             message=message,

@@ -1,22 +1,21 @@
 """Events API endpoints."""
 from datetime import datetime
 from math import ceil
-from typing import Annotated, Optional
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_session
 from app.models.event import (
-    Event,
     EventCreate,
     EventDraft,
     EventListResponse,
     EventResponse,
     EventUpdate,
 )
-from app.services.event_service import EventService
 from app.services.ai_service import AIService
+from app.services.event_service import EventService
 
 router = APIRouter()
 
@@ -24,9 +23,9 @@ router = APIRouter()
 @router.get("/", response_model=EventListResponse)
 async def list_events(
     session: Annotated[AsyncSession, Depends(get_session)],
-    from_date: Optional[datetime] = Query(None, alias="from"),
-    to_date: Optional[datetime] = Query(None, alias="to"),
-    query: Optional[str] = Query(None),
+    from_date: datetime | None = Query(None, alias="from"),
+    to_date: datetime | None = Query(None, alias="to"),
+    query: str | None = Query(None),
     page: int = Query(1, ge=1),
     size: int = Query(20, ge=1, le=100),
 ) -> EventListResponse:

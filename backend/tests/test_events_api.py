@@ -1,5 +1,4 @@
 """Test events API endpoints."""
-from datetime import datetime
 
 import pytest
 from httpx import AsyncClient

@@ -1,12 +1,11 @@
 """Simple server to test the basic functionality"""
-from datetime import datetime
-from typing import List, Optional
 import json
+import sqlite3
+from datetime import datetime
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import sqlite3
 
 app = FastAPI(title="AI Calendar Backend", version="0.1.0")
 
@@ -22,12 +21,12 @@ app.add_middleware(
 # Simple Pydantic models
 class EventBase(BaseModel):
     title: str
-    description: Optional[str] = None
+    description: str | None = None
     start_datetime: datetime
     end_datetime: datetime
     all_day: bool = False
-    location: Optional[str] = None
-    attendees: List[str] = []
+    location: str | None = None
+    attendees: list[str] = []
     original_timezone: str = "UTC"
 
 class EventCreate(EventBase):
@@ -39,7 +38,7 @@ class Event(EventBase):
     updated_at: datetime
 
 class EventListResponse(BaseModel):
-    events: List[Event]
+    events: list[Event]
     total: int
     page: int
     size: int

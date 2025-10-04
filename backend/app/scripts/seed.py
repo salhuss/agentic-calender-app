@@ -2,8 +2,6 @@
 import asyncio
 from datetime import datetime, timedelta
 
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.core.database import async_session_maker, create_db_and_tables
 from app.models.event import Event
 
@@ -142,7 +140,7 @@ async def seed_data() -> None:
             event_type = "All-day" if event_data["all_day"] else "Timed"
             print(f"  • {event_data['title']} ({event_type})")
 
-        print(f"\n🎉 Database seeded successfully!")
+        print("\n🎉 Database seeded successfully!")
         print(f"You can now run the application and see {events_created} sample events.")
 
 

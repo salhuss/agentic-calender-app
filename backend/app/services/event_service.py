@@ -1,7 +1,5 @@
 """Event service with business logic."""
 from datetime import datetime
-from typing import Optional, Tuple
-from math import ceil
 
 from sqlalchemy import and_, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -48,12 +46,12 @@ class EventService:
     @staticmethod
     async def list_events(
         session: AsyncSession,
-        from_date: Optional[datetime] = None,
-        to_date: Optional[datetime] = None,
-        query: Optional[str] = None,
+        from_date: datetime | None = None,
+        to_date: datetime | None = None,
+        query: str | None = None,
         page: int = 1,
         size: int = 20,
-    ) -> Tuple[list[Event], int]:
+    ) -> tuple[list[Event], int]:
         """List events with filtering and pagination."""
         statement = select(Event)
 
@@ -145,7 +143,7 @@ class EventService:
         session: AsyncSession,
         start_datetime: datetime,
         end_datetime: datetime,
-        exclude_event_id: Optional[int] = None,
+        exclude_event_id: int | None = None,
     ) -> None:
         """Check for overlapping all-day events."""
         statement = select(Event).where(

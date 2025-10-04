@@ -1,6 +1,5 @@
 """Event model and related schemas."""
 from datetime import datetime
-from typing import Optional
 
 from pydantic import field_validator, model_validator
 from sqlalchemy import JSON, UniqueConstraint
@@ -13,11 +12,11 @@ class EventBase(SQLModel):
     """Base event fields shared across models."""
 
     title: str = Field(max_length=200)
-    description: Optional[str] = Field(default=None, max_length=2000)
+    description: str | None = Field(default=None, max_length=2000)
     start_datetime: datetime
     end_datetime: datetime
     all_day: bool = Field(default=False)
-    location: Optional[str] = Field(default=None, max_length=500)
+    location: str | None = Field(default=None, max_length=500)
     attendees: list[str] = Field(default_factory=list, description="List of email addresses")
     original_timezone: str = Field(default="UTC", max_length=50)
 
@@ -45,7 +44,7 @@ class Event(EventBase, TimestampMixin, table=True):
 
     __tablename__ = "events"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
 
     # Override attendees field with proper JSON type for database
     attendees: list[str] = Field(default_factory=list, sa_column_kwargs={"type_": JSON}, description="List of email addresses")
@@ -70,18 +69,18 @@ class EventCreate(EventBase):
 class EventUpdate(SQLModel):
     """Schema for updating events."""
 
-    title: Optional[str] = Field(default=None, max_length=200)
-    description: Optional[str] = Field(default=None, max_length=2000)
-    start_datetime: Optional[datetime] = None
-    end_datetime: Optional[datetime] = None
-    all_day: Optional[bool] = None
-    location: Optional[str] = Field(default=None, max_length=500)
-    attendees: Optional[list[str]] = None
-    original_timezone: Optional[str] = Field(default=None, max_length=50)
+    title: str | None = Field(default=None, max_length=200)
+    description: str | None = Field(default=None, max_length=2000)
+    start_datetime: datetime | None = None
+    end_datetime: datetime | None = None
+    all_day: bool | None = None
+    location: str | None = Field(default=None, max_length=500)
+    attendees: list[str] | None = None
+    original_timezone: str | None = Field(default=None, max_length=50)
 
     @field_validator("attendees")
     @classmethod
-    def validate_attendees(cls, v: Optional[list[str]]) -> Optional[list[str]]:
+    def validate_attendees(cls, v: list[str] | None) -> list[str] | None:
         """Validate attendee email addresses."""
         if v is None:
             return v
@@ -115,11 +114,11 @@ class EventDraft(SQLModel):
     """Schema for AI-generated event drafts."""
 
     title: str
-    description: Optional[str] = None
-    start_datetime: Optional[datetime] = None
-    end_datetime: Optional[datetime] = None
+    description: str | None = None
+    start_datetime: datetime | None = None
+    end_datetime: datetime | None = None
     all_day: bool = Field(default=False)
-    location: Optional[str] = None
+    location: str | None = None
     attendees: list[str] = Field(default_factory=list)
     confidence: float = Field(ge=0.0, le=1.0, description="AI confidence score")
     extracted_entities: dict = Field(default_factory=dict, description="Raw extracted entities")

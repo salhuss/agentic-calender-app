@@ -1,6 +1,6 @@
 """Pytest configuration and fixtures."""
 import asyncio
-from typing import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator, Generator
 
 import pytest
 from httpx import AsyncClient
@@ -9,7 +9,6 @@ from sqlmodel import SQLModel
 
 from app.core.database import get_session
 from app.main import app
-
 
 # Test database URL
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"

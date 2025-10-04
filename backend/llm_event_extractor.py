@@ -2,8 +2,7 @@
 import json
 import logging
 import re
-from datetime import datetime, timedelta
-from typing import Optional, Dict, Any
+from datetime import datetime
 
 import ollama
 from pydantic import BaseModel
@@ -15,11 +14,11 @@ logger = logging.getLogger(__name__)
 class EventExtraction(BaseModel):
     """Structured event data extracted from natural language."""
     title: str
-    description: Optional[str] = None
-    start_datetime: Optional[str] = None  # ISO format
-    end_datetime: Optional[str] = None    # ISO format
+    description: str | None = None
+    start_datetime: str | None = None  # ISO format
+    end_datetime: str | None = None    # ISO format
     all_day: bool = False
-    location: Optional[str] = None
+    location: str | None = None
     attendees: list[str] = []
     confidence: float = 0.0
     reasoning: str = ""
