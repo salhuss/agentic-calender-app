@@ -184,8 +184,7 @@ async def test_timed_events_can_overlap(client: AsyncClient):
 async def test_create_event_draft(client: AsyncClient):
     """Test creating an event draft from natural language."""
     response = await client.post(
-        "/api/v1/events/draft",
-        json={"prompt": "Meeting with John tomorrow at 3pm"}
+        "/api/v1/events/draft", json={"prompt": "Meeting with John tomorrow at 3pm"}
     )
     assert response.status_code == 200
 

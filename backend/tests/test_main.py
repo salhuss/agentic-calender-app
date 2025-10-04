@@ -1,4 +1,5 @@
 """Test main application."""
+
 import pytest
 from httpx import AsyncClient
 

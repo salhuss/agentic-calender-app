@@ -1,4 +1,5 @@
 """LLM-powered event extraction service using Ollama."""
+
 import json
 import logging
 import re
@@ -13,10 +14,11 @@ logger = logging.getLogger(__name__)
 
 class EventExtraction(BaseModel):
     """Structured event data extracted from natural language."""
+
     title: str
     description: str | None = None
     start_datetime: str | None = None  # ISO format
-    end_datetime: str | None = None    # ISO format
+    end_datetime: str | None = None  # ISO format
     all_day: bool = False
     location: str | None = None
     attendees: list[str] = []
@@ -85,25 +87,20 @@ Respond with valid JSON only, no other text."""
             # Query the LLM
             response = self.client.chat(
                 model=self.model_name,
-                messages=[
-                    {
-                        'role': 'user',
-                        'content': prompt
-                    }
-                ],
+                messages=[{"role": "user", "content": prompt}],
                 options={
-                    'temperature': 0.1,  # Low temperature for consistent extraction
-                    'top_p': 0.9,
-                    'num_predict': 512,  # Limit response length
-                }
+                    "temperature": 0.1,  # Low temperature for consistent extraction
+                    "top_p": 0.9,
+                    "num_predict": 512,  # Limit response length
+                },
             )
 
             # Extract the response content
-            response_content = response['message']['content'].strip()
+            response_content = response["message"]["content"].strip()
             logger.info(f"LLM response: {response_content}")
 
             # Try to parse JSON from the response
-            json_match = re.search(r'\{.*\}', response_content, re.DOTALL)
+            json_match = re.search(r"\{.*\}", response_content, re.DOTALL)
             if json_match:
                 json_str = json_match.group()
                 extracted_data = json.loads(json_str)
@@ -139,7 +136,7 @@ Respond with valid JSON only, no other text."""
             title = "Conference"
 
         # Extract people
-        with_match = re.search(r'with\s+([\w\s@.]+)', user_input, re.IGNORECASE)
+        with_match = re.search(r"with\s+([\w\s@.]+)", user_input, re.IGNORECASE)
         if with_match:
             person = with_match.group(1).strip()
             title += f" with {person}"
@@ -153,14 +150,14 @@ Respond with valid JSON only, no other text."""
             location=None,
             attendees=[],
             confidence=0.3,  # Low confidence for rule-based extraction
-            reasoning="Fallback rule-based extraction used due to LLM unavailability"
+            reasoning="Fallback rule-based extraction used due to LLM unavailability",
         )
 
     def check_model_availability(self) -> bool:
         """Check if the specified model is available in Ollama."""
         try:
             models = self.client.list()
-            available_models = [model['name'] for model in models['models']]
+            available_models = [model["name"] for model in models["models"]]
             return self.model_name in available_models
         except Exception as e:
             logger.error(f"Error checking model availability: {e}")
@@ -183,7 +180,7 @@ if __name__ == "__main__":
         "Lunch at Cafe Rio Friday 12:30pm with sarah@company.com",
         "All day conference next week",
         "Call with the team in 2 hours",
-        "Workshop from 1-5pm at Innovation Lab"
+        "Workshop from 1-5pm at Innovation Lab",
     ]
 
     for test_input in test_inputs:

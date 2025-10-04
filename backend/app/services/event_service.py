@@ -1,4 +1,5 @@
 """Event service with business logic."""
+
 from datetime import datetime
 
 from sqlalchemy import and_, func, or_

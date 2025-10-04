@@ -1,4 +1,5 @@
 """Pytest configuration and fixtures."""
+
 import asyncio
 from collections.abc import AsyncGenerator, Generator
 
@@ -45,6 +46,7 @@ async def test_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
 @pytest.fixture
 async def client(test_session) -> AsyncGenerator[AsyncClient, None]:
     """Create a test client with database session override."""
+
     async def override_get_session() -> AsyncGenerator[AsyncSession, None]:
         yield test_session
 

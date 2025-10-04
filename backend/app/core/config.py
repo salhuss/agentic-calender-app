@@ -1,4 +1,5 @@
 """Application configuration."""
+
 import os
 
 from pydantic import validator

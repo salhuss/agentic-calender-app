@@ -1,4 +1,5 @@
 """Test AI service."""
+
 import pytest
 
 from app.services.ai_service import AIService

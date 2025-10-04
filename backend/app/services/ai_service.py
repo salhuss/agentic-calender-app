@@ -1,4 +1,5 @@
 """AI service for natural language event draft generation."""
+
 import re
 from datetime import datetime, timedelta
 from typing import Any
@@ -107,8 +108,18 @@ class AIService:
 
         # Keywords for event type
         event_keywords = [
-            "meeting", "call", "lunch", "dinner", "appointment", "interview",
-            "workout", "gym", "class", "lesson", "conference", "presentation"
+            "meeting",
+            "call",
+            "lunch",
+            "dinner",
+            "appointment",
+            "interview",
+            "workout",
+            "gym",
+            "class",
+            "lesson",
+            "conference",
+            "presentation",
         ]
 
         for keyword in event_keywords:

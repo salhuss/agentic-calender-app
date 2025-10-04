@@ -1,4 +1,5 @@
 """Simple server to test the basic functionality"""
+
 import json
 import sqlite3
 from datetime import datetime
@@ -18,6 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Simple Pydantic models
 class EventBase(BaseModel):
     title: str
@@ -29,13 +31,16 @@ class EventBase(BaseModel):
     attendees: list[str] = []
     original_timezone: str = "UTC"
 
+
 class EventCreate(EventBase):
     pass
+
 
 class Event(EventBase):
     id: int
     created_at: datetime
     updated_at: datetime
+
 
 class EventListResponse(BaseModel):
     events: list[Event]
@@ -44,12 +49,14 @@ class EventListResponse(BaseModel):
     size: int
     pages: int
 
+
 # Database setup
 def init_db():
     conn = sqlite3.connect("data/simple_app.db")
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
@@ -63,18 +70,22 @@ def init_db():
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         )
-    """)
+    """
+    )
 
     conn.commit()
     conn.close()
+
 
 @app.on_event("startup")
 async def startup_event():
     init_db()
 
+
 @app.get("/healthz")
 async def health_check():
     return {"status": "healthy"}
+
 
 @app.get("/api/v1/events", response_model=EventListResponse)
 async def list_events(page: int = 1, size: int = 20):
@@ -87,13 +98,16 @@ async def list_events(page: int = 1, size: int = 20):
 
     # Get events with pagination
     offset = (page - 1) * size
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT id, title, description, start_datetime, end_datetime, all_day,
                location, attendees, original_timezone, created_at, updated_at
         FROM events
         ORDER BY start_datetime
         LIMIT ? OFFSET ?
-    """, (size, offset))
+    """,
+        (size, offset),
+    )
 
     events = []
     for row in cursor.fetchall():
@@ -105,7 +119,7 @@ async def list_events(page: int = 1, size: int = 20):
             "end_datetime": row[4],
             "all_day": bool(row[5]),
             "location": row[6],
-            "attendees": json.loads(row[7] or '[]'),
+            "attendees": json.loads(row[7] or "[]"),
             "original_timezone": row[8],
             "created_at": row[9],
             "updated_at": row[10],
@@ -116,12 +130,9 @@ async def list_events(page: int = 1, size: int = 20):
 
     pages = (total + size - 1) // size
     return EventListResponse(
-        events=events,
-        total=total,
-        page=page,
-        size=size,
-        pages=pages
+        events=events, total=total, page=page, size=size, pages=pages
     )
+
 
 @app.post("/api/v1/events", response_model=Event, status_code=201)
 async def create_event(event_data: EventCreate):
@@ -130,23 +141,26 @@ async def create_event(event_data: EventCreate):
     conn = sqlite3.connect("data/simple_app.db")
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         INSERT INTO events (title, description, start_datetime, end_datetime, all_day,
                           location, attendees, original_timezone, created_at,
                           updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (
-        event_data.title,
-        event_data.description,
-        event_data.start_datetime.isoformat(),
-        event_data.end_datetime.isoformat(),
-        int(event_data.all_day),
-        event_data.location,
-        json.dumps(event_data.attendees),
-        event_data.original_timezone,
-        now,
-        now
-    ))
+    """,
+        (
+            event_data.title,
+            event_data.description,
+            event_data.start_datetime.isoformat(),
+            event_data.end_datetime.isoformat(),
+            int(event_data.all_day),
+            event_data.location,
+            json.dumps(event_data.attendees),
+            event_data.original_timezone,
+            now,
+            now,
+        ),
+    )
 
     event_id = cursor.lastrowid
     conn.commit()
@@ -164,19 +178,23 @@ async def create_event(event_data: EventCreate):
         attendees=event_data.attendees,
         original_timezone=event_data.original_timezone,
         created_at=datetime.fromisoformat(now),
-        updated_at=datetime.fromisoformat(now)
+        updated_at=datetime.fromisoformat(now),
     )
+
 
 @app.get("/api/v1/events/{event_id}", response_model=Event)
 async def get_event(event_id: int):
     conn = sqlite3.connect("data/simple_app.db")
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT id, title, description, start_datetime, end_datetime, all_day,
                location, attendees, original_timezone, created_at, updated_at
         FROM events WHERE id = ?
-    """, (event_id,))
+    """,
+        (event_id,),
+    )
 
     row = cursor.fetchone()
     if not row:
@@ -190,7 +208,7 @@ async def get_event(event_id: int):
         "end_datetime": row[4],
         "all_day": bool(row[5]),
         "location": row[6],
-        "attendees": json.loads(row[7] or '[]'),
+        "attendees": json.loads(row[7] or "[]"),
         "original_timezone": row[8],
         "created_at": row[9],
         "updated_at": row[10],
@@ -198,6 +216,7 @@ async def get_event(event_id: int):
 
     conn.close()
     return Event(**event_dict)
+
 
 # LLM-powered AI draft endpoint
 @app.post("/api/v1/events/draft")
@@ -214,7 +233,7 @@ async def create_event_draft(prompt_data: dict):
             "location": None,
             "attendees": [],
             "confidence": 0.0,
-            "extracted_entities": {"error": "No prompt provided"}
+            "extracted_entities": {"error": "No prompt provided"},
         }
 
     # Use LLM-powered extraction
@@ -236,8 +255,8 @@ async def create_event_draft(prompt_data: dict):
             "extracted_entities": {
                 "prompt": prompt,
                 "reasoning": result.reasoning,
-                "extraction_method": "llm" if result.confidence > 0.5 else "rule-based"
-            }
+                "extraction_method": "llm" if result.confidence > 0.5 else "rule-based",
+            },
         }
     except Exception as e:
         # Fallback to simple rule-based extraction on any error
@@ -252,7 +271,7 @@ async def create_event_draft(prompt_data: dict):
             title = "Call"
 
         # Extract people
-        with_match = re.search(r'with\s+(\w+)', prompt, re.IGNORECASE)
+        with_match = re.search(r"with\s+(\w+)", prompt, re.IGNORECASE)
         if with_match:
             title += f" with {with_match.group(1)}"
 
@@ -268,10 +287,12 @@ async def create_event_draft(prompt_data: dict):
             "extracted_entities": {
                 "prompt": prompt,
                 "error": str(e),
-                "extraction_method": "rule-based-fallback"
-            }
+                "extraction_method": "rule-based-fallback",
+            },
         }
+
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,4 +1,5 @@
 """Event model and related schemas."""
+
 from datetime import datetime
 
 from pydantic import field_validator, model_validator
@@ -27,6 +28,7 @@ class EventBase(SQLModel):
     def validate_attendees(cls, v: list[str]) -> list[str]:
         """Validate attendee email addresses."""
         import re
+
         email_regex = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
         for email in v:
             if not email_regex.match(email):
@@ -52,16 +54,13 @@ class Event(EventBase, TimestampMixin, table=True):
     attendees: list[str] = Field(
         default_factory=list,
         sa_column_kwargs={"type_": JSON},
-        description="List of email addresses"
+        description="List of email addresses",
     )
 
     # Add unique constraint to prevent identical duplicates (optional requirement)
     __table_args__ = (
         UniqueConstraint(
-            "title",
-            "start_datetime",
-            "end_datetime",
-            name="uq_events_title_start_end"
+            "title", "start_datetime", "end_datetime", name="uq_events_title_start_end"
         ),
     )
 
@@ -91,6 +90,7 @@ class EventUpdate(SQLModel):
         if v is None:
             return v
         import re
+
         email_regex = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
         for email in v:
             if not email_regex.match(email):
@@ -128,6 +128,5 @@ class EventDraft(SQLModel):
     attendees: list[str] = Field(default_factory=list)
     confidence: float = Field(ge=0.0, le=1.0, description="AI confidence score")
     extracted_entities: dict = Field(
-        default_factory=dict,
-        description="Raw extracted entities"
+        default_factory=dict, description="Raw extracted entities"
     )
