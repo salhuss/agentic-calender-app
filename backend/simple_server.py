@@ -132,7 +132,8 @@ async def create_event(event_data: EventCreate):
 
     cursor.execute("""
         INSERT INTO events (title, description, start_datetime, end_datetime, all_day,
-                          location, attendees, original_timezone, created_at, updated_at)
+                          location, attendees, original_timezone, created_at,
+                          updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         event_data.title,

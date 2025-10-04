@@ -36,7 +36,8 @@ class LLMEventExtractor:
         """Create a structured prompt for event extraction."""
         current_time = datetime.now().isoformat()
 
-        return f"""You are an expert AI assistant specialized in extracting structured calendar event information from natural language text.
+        return f"""You are an expert AI assistant specialized in extracting structured
+calendar event information from natural language text.
 
 Current date/time: {current_time}
 
@@ -68,7 +69,7 @@ Return ONLY a valid JSON object with this exact structure:
 
 Examples:
 - "Meeting tomorrow 3pm" → start: tomorrow 3pm, end: tomorrow 4pm, title: "Meeting"
-- "Lunch with John Friday" → title: "Lunch with John", start: next Friday 12pm, end: next Friday 1pm
+- "Lunch with John Friday" → title: "Lunch with John", start: next Friday 12pm
 - "All day conference next week" → all_day: true, title: "Conference"
 
 Respond with valid JSON only, no other text."""
@@ -108,7 +109,9 @@ Respond with valid JSON only, no other text."""
                 extracted_data = json.loads(json_str)
                 return EventExtraction(**extracted_data)
             else:
-                logger.warning("No JSON found in LLM response, falling back to rule-based extraction")
+                logger.warning(
+                    "No JSON found in LLM response, falling back to rule-based"
+                )
                 return self._fallback_extraction(user_input)
 
         except ollama.ResponseError as e:
