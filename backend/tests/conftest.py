@@ -2,7 +2,7 @@
 
 import asyncio
 from collections.abc import AsyncGenerator, Generator
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 from httpx import AsyncClient
@@ -60,7 +60,7 @@ async def client(test_session: AsyncSession) -> AsyncGenerator[AsyncClient, None
 
 
 @pytest.fixture
-def sample_event_data() -> Dict[str, Any]:
+def sample_event_data() -> dict[str, Any]:
     """Sample event data for testing."""
     return {
         "title": "Test Event",

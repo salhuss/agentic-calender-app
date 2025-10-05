@@ -2,7 +2,7 @@
 
 import re
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from app.models.event import EventDraft
 
@@ -48,9 +48,9 @@ class AIService:
         )
 
     @staticmethod
-    def _extract_entities(prompt: str) -> Dict[str, Any]:
+    def _extract_entities(prompt: str) -> dict[str, Any]:
         """Extract entities from the prompt."""
-        entities: Dict[str, Any] = {
+        entities: dict[str, Any] = {
             "times": [],
             "dates": [],
             "locations": [],
@@ -129,7 +129,7 @@ class AIService:
         return entities
 
     @staticmethod
-    def _extract_title(prompt: str, entities: Dict[str, Any]) -> str:
+    def _extract_title(prompt: str, entities: dict[str, Any]) -> str:
         """Extract or generate a title from the prompt."""
         # Look for common title patterns
         title_patterns = [
@@ -182,7 +182,7 @@ class AIService:
         return None
 
     @staticmethod
-    def _extract_attendees(prompt: str) -> List[str]:
+    def _extract_attendees(prompt: str) -> list[str]:
         """Extract attendees (email addresses) from prompt."""
         # Email pattern
         email_pattern = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
@@ -192,8 +192,8 @@ class AIService:
 
     @staticmethod
     def _extract_datetime_info(
-        prompt: str, entities: Dict[str, Any]
-    ) -> Tuple[datetime | None, datetime | None, bool]:
+        prompt: str, entities: dict[str, Any]
+    ) -> tuple[datetime | None, datetime | None, bool]:
         """Extract start/end datetime and all_day flag."""
         now = datetime.now()
         start_datetime = None
@@ -266,7 +266,7 @@ class AIService:
         start_datetime: datetime | None,
         end_datetime: datetime | None,
         location: str | None,
-        attendees: List[str],
+        attendees: list[str],
     ) -> float:
         """Calculate confidence score based on extracted information."""
         score = 0.0

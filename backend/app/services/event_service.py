@@ -57,7 +57,6 @@ class EventService:
         statement = select(Event)
 
         # Apply filters
-        from sqlalchemy import ColumnElement
         filters: list = []
 
         if from_date:
@@ -149,12 +148,21 @@ class EventService:
     ) -> None:
         """Check for overlapping all-day events."""
         statement = select(Event).where(
-            Event.all_day == True,
+            Event.all_day,
             or_(
                 # Type ignore needed for SQLAlchemy column comparisons
-                and_(Event.start_datetime <= start_datetime, Event.end_datetime > start_datetime),  # type: ignore
-                and_(Event.start_datetime < end_datetime, Event.end_datetime >= end_datetime),  # type: ignore
-                and_(Event.start_datetime >= start_datetime, Event.end_datetime <= end_datetime),  # type: ignore
+                and_(  # type: ignore
+                    Event.start_datetime <= start_datetime,
+                    Event.end_datetime > start_datetime,
+                ),
+                and_(  # type: ignore
+                    Event.start_datetime < end_datetime,
+                    Event.end_datetime >= end_datetime,
+                ),
+                and_(  # type: ignore
+                    Event.start_datetime >= start_datetime,
+                    Event.end_datetime <= end_datetime,
+                ),
             ),
         )
 

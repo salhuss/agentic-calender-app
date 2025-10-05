@@ -1,13 +1,15 @@
 """Test events API endpoints."""
 
-import pytest
-from typing import Any, Dict
+from typing import Any
 
+import pytest
 from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
-async def test_create_event(client: AsyncClient, sample_event_data: Dict[str, Any]) -> None:
+async def test_create_event(
+    client: AsyncClient, sample_event_data: dict[str, Any]
+) -> None:
     """Test creating an event."""
     response = await client.post("/api/v1/events/", json=sample_event_data)
     assert response.status_code == 201
@@ -22,7 +24,9 @@ async def test_create_event(client: AsyncClient, sample_event_data: Dict[str, An
 
 
 @pytest.mark.asyncio
-async def test_create_event_invalid_datetime(client: AsyncClient, sample_event_data: Dict[str, Any]) -> None:
+async def test_create_event_invalid_datetime(
+    client: AsyncClient, sample_event_data: dict[str, Any]
+) -> None:
     """Test creating an event with invalid datetime (end before start)."""
     invalid_data = sample_event_data.copy()
     invalid_data["start_datetime"] = "2023-12-01T12:00:00Z"
@@ -33,7 +37,9 @@ async def test_create_event_invalid_datetime(client: AsyncClient, sample_event_d
 
 
 @pytest.mark.asyncio
-async def test_get_event(client: AsyncClient, sample_event_data: Dict[str, Any]) -> None:
+async def test_get_event(
+    client: AsyncClient, sample_event_data: dict[str, Any]
+) -> None:
     """Test getting a specific event."""
     # Create event first
     create_response = await client.post("/api/v1/events/", json=sample_event_data)
@@ -56,7 +62,9 @@ async def test_get_nonexistent_event(client: AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
-async def test_list_events(client: AsyncClient, sample_event_data: Dict[str, Any]) -> None:
+async def test_list_events(
+    client: AsyncClient, sample_event_data: dict[str, Any]
+) -> None:
     """Test listing events."""
     # Create a few events
     for i in range(3):
@@ -79,7 +87,9 @@ async def test_list_events(client: AsyncClient, sample_event_data: Dict[str, Any
 
 
 @pytest.mark.asyncio
-async def test_list_events_with_query(client: AsyncClient, sample_event_data: Dict[str, Any]) -> None:
+async def test_list_events_with_query(
+    client: AsyncClient, sample_event_data: dict[str, Any]
+) -> None:
     """Test listing events with search query."""
     # Create events with different titles
     event1 = sample_event_data.copy()
@@ -100,7 +110,9 @@ async def test_list_events_with_query(client: AsyncClient, sample_event_data: Di
 
 
 @pytest.mark.asyncio
-async def test_update_event(client: AsyncClient, sample_event_data: Dict[str, Any]) -> None:
+async def test_update_event(
+    client: AsyncClient, sample_event_data: dict[str, Any]
+) -> None:
     """Test updating an event."""
     # Create event
     create_response = await client.post("/api/v1/events/", json=sample_event_data)
@@ -119,7 +131,9 @@ async def test_update_event(client: AsyncClient, sample_event_data: Dict[str, An
 
 
 @pytest.mark.asyncio
-async def test_delete_event(client: AsyncClient, sample_event_data: Dict[str, Any]) -> None:
+async def test_delete_event(
+    client: AsyncClient, sample_event_data: dict[str, Any]
+) -> None:
     """Test deleting an event."""
     # Create event
     create_response = await client.post("/api/v1/events/", json=sample_event_data)
