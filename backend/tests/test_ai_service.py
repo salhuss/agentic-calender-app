@@ -161,7 +161,10 @@ async def test_extract_title_fallbacks() -> None:
 async def test_extract_description() -> None:
     """Test description extraction."""
     # Test with long prompt (returns description)
-    long_prompt = "This is a very long prompt that should be used as description because it exceeds the minimum length"
+    long_prompt = (
+        "This is a very long prompt that should be used as description "
+        "because it exceeds the minimum length"
+    )
     description = AIService._extract_description(long_prompt)
     assert description == long_prompt
 
@@ -174,7 +177,8 @@ async def test_extract_description() -> None:
 @pytest.mark.asyncio
 async def test_extract_location_edge_cases() -> None:
     """Test location extraction edge cases."""
-    # Test location that's too short (should pass the length > 2 check but still test the logic)
+    # Test location that's too short (should pass the length > 2 check
+    # but still test the logic)
     prompt = "Meeting at AB tomorrow"  # 2-char location
     location = AIService._extract_location(prompt)
     # This tests line 179 condition checking
