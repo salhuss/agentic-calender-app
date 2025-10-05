@@ -48,17 +48,15 @@ export const parseInputDate = (value: string, timezone: string = 'local'): { sta
 
 export const getMonthCalendarDays = (year: number, month: number): DateTime[] => {
   const firstDay = DateTime.local(year, month, 1);
-  const lastDay = firstDay.endOf('month');
 
   // Start from the beginning of the week containing the first day
   const startDate = firstDay.startOf('week');
-  // End at the end of the week containing the last day
-  const endDate = lastDay.endOf('week');
 
   const days: DateTime[] = [];
   let current = startDate;
 
-  while (current <= endDate) {
+  // Always return exactly 42 days (6 weeks * 7 days)
+  for (let i = 0; i < 42; i++) {
     days.push(current);
     current = current.plus({ days: 1 });
   }
@@ -84,10 +82,11 @@ export const isEventInDay = (
 ): boolean => {
   const startDt = DateTime.fromISO(eventStart);
   const endDt = DateTime.fromISO(eventEnd);
-  const dayStart = day.startOf('day');
-  const dayEnd = day.endOf('day');
+  // Convert to the same timezone as the day for comparison
+  const dayStart = day.startOf('day').toUTC();
+  const dayEnd = day.endOf('day').toUTC();
 
-  return startDt < dayEnd && endDt > dayStart;
+  return startDt.toUTC() < dayEnd && endDt.toUTC() > dayStart;
 };
 
 export const getCurrentTimezone = (): string => {

@@ -160,6 +160,7 @@ async def clear_data() -> None:
     async with async_session_maker() as session:
         # Delete all events
         from sqlmodel import delete
+
         result = await session.execute(delete(Event))
         deleted_count = result.rowcount
         await session.commit()

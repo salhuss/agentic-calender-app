@@ -55,7 +55,7 @@ test.describe('Calendar CRUD Operations', () => {
 
   test('should create an all-day event', async ({ page }) => {
     // Create a new event
-    await page.click('text=Create Event');
+    await page.click('text=New Event');
 
     // Fill out the form for an all-day event
     await page.fill('input[name="title"]', 'All Day Conference');
@@ -115,7 +115,7 @@ test.describe('Calendar CRUD Operations', () => {
 
   test('should use AI assistant to create event', async ({ page }) => {
     // Create a new event
-    await page.click('text=Create Event');
+    await page.click('text=New Event');
 
     // Use the AI assistant
     await page.fill('input[name="aiPrompt"]', 'Meeting with John tomorrow at 3pm at Cafe Rio');
@@ -154,7 +154,7 @@ test.describe('Calendar CRUD Operations', () => {
 
   test('should validate form inputs', async ({ page }) => {
     // Try to create event without title
-    await page.click('text=Create Event');
+    await page.click('text=New Event');
     await page.click('button:has-text("Create Event")');
 
     // Should show validation error
