@@ -21,7 +21,7 @@ async def test_create_event(test_session: AsyncSession) -> None:
         all_day=False,
         location="Test Location",
         attendees=["test@example.com"],
-        original_timezone="UTC"
+        original_timezone="UTC",
     )
 
     event = await EventService.create_event(test_session, event_data)
@@ -45,7 +45,7 @@ async def test_create_all_day_event(test_session: AsyncSession) -> None:
         all_day=True,
         location="Everywhere",
         attendees=[],
-        original_timezone="UTC"
+        original_timezone="UTC",
     )
 
     event = await EventService.create_event(test_session, event_data)
@@ -88,7 +88,7 @@ async def test_get_event_success(test_session: AsyncSession) -> None:
         title="Test Event",
         start_datetime=datetime(2024, 1, 1, 10, 0),
         end_datetime=datetime(2024, 1, 1, 11, 0),
-        all_day=False
+        all_day=False,
     )
     created_event = await EventService.create_event(test_session, event_data)
 
@@ -113,12 +113,12 @@ async def test_list_events_no_filters(test_session: AsyncSession) -> None:
     event1_data = EventCreate(
         title="Event 1",
         start_datetime=datetime(2024, 1, 1, 10, 0),
-        end_datetime=datetime(2024, 1, 1, 11, 0)
+        end_datetime=datetime(2024, 1, 1, 11, 0),
     )
     event2_data = EventCreate(
         title="Event 2",
         start_datetime=datetime(2024, 1, 2, 10, 0),
-        end_datetime=datetime(2024, 1, 2, 11, 0)
+        end_datetime=datetime(2024, 1, 2, 11, 0),
     )
     await EventService.create_event(test_session, event1_data)
     await EventService.create_event(test_session, event2_data)
@@ -137,20 +137,19 @@ async def test_list_events_with_date_filter(test_session: AsyncSession) -> None:
     early_event = EventCreate(
         title="Early Event",
         start_datetime=datetime(2024, 1, 1, 10, 0),
-        end_datetime=datetime(2024, 1, 1, 11, 0)
+        end_datetime=datetime(2024, 1, 1, 11, 0),
     )
     late_event = EventCreate(
         title="Late Event",
         start_datetime=datetime(2024, 1, 10, 10, 0),
-        end_datetime=datetime(2024, 1, 10, 11, 0)
+        end_datetime=datetime(2024, 1, 10, 11, 0),
     )
     await EventService.create_event(test_session, early_event)
     await EventService.create_event(test_session, late_event)
 
     # Filter from Jan 5 onwards
     events, total = await EventService.list_events(
-        test_session,
-        from_date=datetime(2024, 1, 5)
+        test_session, from_date=datetime(2024, 1, 5)
     )
 
     assert len(events) == 1
@@ -159,8 +158,7 @@ async def test_list_events_with_date_filter(test_session: AsyncSession) -> None:
 
     # Filter up to Jan 5
     events, total = await EventService.list_events(
-        test_session,
-        to_date=datetime(2024, 1, 5)
+        test_session, to_date=datetime(2024, 1, 5)
     )
 
     assert len(events) == 1
@@ -176,14 +174,14 @@ async def test_list_events_with_search_query(test_session: AsyncSession) -> None
         description="Discuss project",
         location="Office",
         start_datetime=datetime(2024, 1, 1, 10, 0),
-        end_datetime=datetime(2024, 1, 1, 11, 0)
+        end_datetime=datetime(2024, 1, 1, 11, 0),
     )
     event2 = EventCreate(
         title="Lunch break",
         description="Eat at cafe",
         location="Cafe Rio",
         start_datetime=datetime(2024, 1, 1, 12, 0),
-        end_datetime=datetime(2024, 1, 1, 13, 0)
+        end_datetime=datetime(2024, 1, 1, 13, 0),
     )
     await EventService.create_event(test_session, event1)
     await EventService.create_event(test_session, event2)
@@ -211,8 +209,8 @@ async def test_list_events_pagination(test_session: AsyncSession) -> None:
     for i in range(5):
         event_data = EventCreate(
             title=f"Event {i}",
-            start_datetime=datetime(2024, 1, i+1, 10, 0),
-            end_datetime=datetime(2024, 1, i+1, 11, 0)
+            start_datetime=datetime(2024, 1, i + 1, 10, 0),
+            end_datetime=datetime(2024, 1, i + 1, 11, 0),
         )
         await EventService.create_event(test_session, event_data)
 
@@ -234,15 +232,12 @@ async def test_update_event(test_session: AsyncSession) -> None:
         title="Original Event",
         description="Original Description",
         start_datetime=datetime(2024, 1, 1, 10, 0),
-        end_datetime=datetime(2024, 1, 1, 11, 0)
+        end_datetime=datetime(2024, 1, 1, 11, 0),
     )
     created_event = await EventService.create_event(test_session, event_data)
 
     # Update event
-    update_data = EventUpdate(
-        title="Updated Event",
-        description="Updated Description"
-    )
+    update_data = EventUpdate(title="Updated Event", description="Updated Description")
     updated_event = await EventService.update_event(
         test_session, created_event.id, update_data
     )
@@ -258,7 +253,7 @@ async def test_update_event_no_changes(test_session: AsyncSession) -> None:
     event_data = EventCreate(
         title="Test Event",
         start_datetime=datetime(2024, 1, 1, 10, 0),
-        end_datetime=datetime(2024, 1, 1, 11, 0)
+        end_datetime=datetime(2024, 1, 1, 11, 0),
     )
     created_event = await EventService.create_event(test_session, event_data)
 
@@ -280,14 +275,14 @@ async def test_update_event_invalid_datetime(test_session: AsyncSession) -> None
     event_data = EventCreate(
         title="Test Event",
         start_datetime=datetime(2024, 1, 1, 10, 0),
-        end_datetime=datetime(2024, 1, 1, 11, 0)
+        end_datetime=datetime(2024, 1, 1, 11, 0),
     )
     created_event = await EventService.create_event(test_session, event_data)
 
     # Try to update with end before start
     update_data = EventUpdate(
         start_datetime=datetime(2024, 1, 1, 12, 0),
-        end_datetime=datetime(2024, 1, 1, 10, 0)  # Before start
+        end_datetime=datetime(2024, 1, 1, 10, 0),  # Before start
     )
 
     with pytest.raises(
@@ -304,7 +299,7 @@ async def test_update_all_day_event_with_overlap(test_session: AsyncSession) -> 
         title="Existing All Day Event",
         start_datetime=datetime(2024, 1, 1, 0, 0),
         end_datetime=datetime(2024, 1, 1, 23, 59),
-        all_day=True
+        all_day=True,
     )
     await EventService.create_event(test_session, all_day_event)
 
@@ -313,7 +308,7 @@ async def test_update_all_day_event_with_overlap(test_session: AsyncSession) -> 
         title="Regular Event",
         start_datetime=datetime(2024, 1, 2, 10, 0),
         end_datetime=datetime(2024, 1, 2, 11, 0),
-        all_day=False
+        all_day=False,
     )
     created_event = await EventService.create_event(test_session, regular_event)
 
@@ -321,7 +316,7 @@ async def test_update_all_day_event_with_overlap(test_session: AsyncSession) -> 
     update_data = EventUpdate(
         start_datetime=datetime(2024, 1, 1, 10, 0),
         end_datetime=datetime(2024, 1, 1, 11, 0),
-        all_day=True
+        all_day=True,
     )
 
     with pytest.raises(
@@ -337,7 +332,7 @@ async def test_delete_event(test_session: AsyncSession) -> None:
     event_data = EventCreate(
         title="To Be Deleted",
         start_datetime=datetime(2024, 1, 1, 10, 0),
-        end_datetime=datetime(2024, 1, 1, 11, 0)
+        end_datetime=datetime(2024, 1, 1, 11, 0),
     )
     created_event = await EventService.create_event(test_session, event_data)
 
@@ -366,7 +361,7 @@ async def test_check_all_day_overlap_with_exclude_id(
         title="All Day Event",
         start_datetime=datetime(2024, 1, 1, 0, 0),
         end_datetime=datetime(2024, 1, 1, 23, 59),
-        all_day=True
+        all_day=True,
     )
     created_event = await EventService.create_event(test_session, event_data)
 
@@ -375,7 +370,7 @@ async def test_check_all_day_overlap_with_exclude_id(
         test_session,
         datetime(2024, 1, 1, 0, 0),
         datetime(2024, 1, 1, 23, 59),
-        exclude_event_id=created_event.id
+        exclude_event_id=created_event.id,
     )
 
     # This should complete without raising ConflictError

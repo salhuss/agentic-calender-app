@@ -117,15 +117,15 @@ async def test_extract_entities_with_keywords() -> None:
     # Test different keywords
     prompts = [
         "meeting with John",  # meeting keyword
-        "lunch at cafe",      # lunch keyword
-        "dinner tomorrow",    # dinner keyword
-        "call with team",     # call keyword
+        "lunch at cafe",  # lunch keyword
+        "dinner tomorrow",  # dinner keyword
+        "call with team",  # call keyword
         "appointment today",  # appointment keyword
-        "interview next week", # interview keyword
-        "workout at gym",     # workout keyword
-        "class tomorrow",     # class keyword
-        "conference all day", # conference keyword
-        "presentation prep"   # presentation keyword
+        "interview next week",  # interview keyword
+        "workout at gym",  # workout keyword
+        "class tomorrow",  # class keyword
+        "conference all day",  # conference keyword
+        "presentation prep",  # presentation keyword
     ]
 
     for prompt in prompts:
@@ -257,7 +257,7 @@ async def test_calculate_confidence_edge_cases() -> None:
         start_datetime=datetime.now(),
         end_datetime=None,  # Only start datetime
         location=None,
-        attendees=[]
+        attendees=[],
     )
     # This should hit the elif branch on line 282-283
     assert 0.2 < conf < 0.8
@@ -283,5 +283,6 @@ async def test_datetime_next_week_parsing() -> None:
     assert all_day is True
     if start_dt:
         from datetime import datetime, timedelta
+
         expected_date = (datetime.now() + timedelta(weeks=1)).date()
         assert start_dt.date() == expected_date

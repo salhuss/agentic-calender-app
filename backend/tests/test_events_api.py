@@ -212,8 +212,6 @@ async def test_create_event_draft(client: AsyncClient) -> None:
     assert 0.0 <= data["confidence"] <= 1.0
 
 
-
-
 @pytest.mark.asyncio
 async def test_list_events_empty_database(client: AsyncClient) -> None:
     """Test listing events when database is empty (line 43: else 1 case)."""
