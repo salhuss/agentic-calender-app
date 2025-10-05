@@ -5,6 +5,7 @@ from collections.abc import AsyncGenerator, Generator
 from typing import Any
 
 import pytest
+import httpx
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlmodel import SQLModel
@@ -53,7 +54,8 @@ async def client(test_session: AsyncSession) -> AsyncGenerator[AsyncClient, None
 
     app.dependency_overrides[get_session] = override_get_session
 
-    async with AsyncClient(base_url="http://test") as ac:
+    transport = httpx.ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
 
     app.dependency_overrides.clear()

@@ -66,15 +66,28 @@ async def test_extract_entities() -> None:
 @pytest.mark.asyncio
 async def test_calculate_confidence() -> None:
     """Test confidence calculation."""
-    # High confidence - has title, datetime, location, attendees
+    from datetime import datetime
+
+    # High confidence - has title, datetime, location, attendees (all factors)
+    now = datetime.now()
     high_conf = AIService._calculate_confidence(
+        title="Meeting with John",
+        start_datetime=now,
+        end_datetime=now,
+        location="Cafe Rio",
+        attendees=["john@example.com"],
+    )
+    assert high_conf > 0.8  # Should be 1.0 (5/5 factors)
+
+    # Medium confidence - has title, location, attendees (no datetime)
+    medium_conf = AIService._calculate_confidence(
         title="Meeting with John",
         start_datetime=None,
         end_datetime=None,
         location="Cafe Rio",
         attendees=["john@example.com"],
     )
-    assert high_conf > 0.8
+    assert 0.5 <= medium_conf <= 0.7  # Should be 0.6 (3/5 factors)
 
     # Low confidence - only has title
     low_conf = AIService._calculate_confidence(
@@ -84,4 +97,4 @@ async def test_calculate_confidence() -> None:
         location=None,
         attendees=[],
     )
-    assert low_conf < 0.5
+    assert low_conf < 0.5  # Should be 0.2 (1/5 factors)
