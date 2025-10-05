@@ -4,8 +4,8 @@ import asyncio
 from collections.abc import AsyncGenerator, Generator
 from typing import Any
 
-import pytest
 import httpx
+import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlmodel import SQLModel
