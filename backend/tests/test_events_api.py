@@ -210,3 +210,17 @@ async def test_create_event_draft(client: AsyncClient) -> None:
     assert "extracted_entities" in data
     assert isinstance(data["confidence"], float)
     assert 0.0 <= data["confidence"] <= 1.0
+
+
+
+
+@pytest.mark.asyncio
+async def test_list_events_empty_database(client: AsyncClient) -> None:
+    """Test listing events when database is empty (line 43: else 1 case)."""
+    response = await client.get("/api/v1/events/")
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data["total"] == 0
+    assert data["pages"] == 1  # This should hit the 'else 1' case on line 43
+    assert len(data["events"]) == 0

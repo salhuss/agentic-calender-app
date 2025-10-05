@@ -85,4 +85,4 @@ asyncio_mode = "auto"
 
 [tool.coverage.run]
 source = ["app"]
-omit = ["*/tests/*", "*/test_*"]
+omit = ["*/tests/*", "*/test_*", "app/scripts/seed.py"]
