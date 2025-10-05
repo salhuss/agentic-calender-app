@@ -1,7 +1,6 @@
 """Test event service business logic."""
 
-from datetime import datetime, timedelta
-from typing import Any
+from datetime import datetime
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -75,7 +74,9 @@ async def test_create_all_day_event_with_overlap(test_session: AsyncSession) -> 
         all_day=True,
     )
 
-    with pytest.raises(ConflictError, match="All-day event overlaps with existing event"):
+    with pytest.raises(
+        ConflictError, match="All-day event overlaps with existing event"
+    ):
         await EventService.create_event(test_session, overlapping_event)
 
 
@@ -289,7 +290,9 @@ async def test_update_event_invalid_datetime(test_session: AsyncSession) -> None
         end_datetime=datetime(2024, 1, 1, 10, 0)  # Before start
     )
 
-    with pytest.raises(ConflictError, match="End datetime must be after start datetime"):
+    with pytest.raises(
+        ConflictError, match="End datetime must be after start datetime"
+    ):
         await EventService.update_event(test_session, created_event.id, update_data)
 
 
@@ -321,7 +324,9 @@ async def test_update_all_day_event_with_overlap(test_session: AsyncSession) -> 
         all_day=True
     )
 
-    with pytest.raises(ConflictError, match="All-day event overlaps with existing event"):
+    with pytest.raises(
+        ConflictError, match="All-day event overlaps with existing event"
+    ):
         await EventService.update_event(test_session, created_event.id, update_data)
 
 
@@ -352,7 +357,9 @@ async def test_delete_nonexistent_event(test_session: AsyncSession) -> None:
 
 
 @pytest.mark.asyncio
-async def test_check_all_day_overlap_with_exclude_id(test_session: AsyncSession) -> None:
+async def test_check_all_day_overlap_with_exclude_id(
+    test_session: AsyncSession,
+) -> None:
     """Test all-day overlap check excludes specified event ID."""
     # Create all-day event
     event_data = EventCreate(
