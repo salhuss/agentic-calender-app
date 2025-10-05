@@ -148,7 +148,7 @@ class EventService:
     ) -> None:
         """Check for overlapping all-day events."""
         statement = select(Event).where(
-            Event.all_day is True,
+            Event.all_day.is_(True),  # type: ignore
             or_(
                 and_(
                     Event.start_datetime <= start_datetime,  # type: ignore
