@@ -52,7 +52,6 @@ class Event(EventBase, TimestampMixin, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
 
-
     # Add unique constraint to prevent identical duplicates (optional requirement)
     __table_args__ = (
         UniqueConstraint(
