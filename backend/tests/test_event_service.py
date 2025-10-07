@@ -93,6 +93,7 @@ async def test_get_event_success(test_session: AsyncSession) -> None:
     created_event = await EventService.create_event(test_session, event_data)
 
     # Get the event
+    assert created_event.id is not None
     retrieved_event = await EventService.get_event(test_session, created_event.id)
 
     assert retrieved_event.id == created_event.id
@@ -238,6 +239,7 @@ async def test_update_event(test_session: AsyncSession) -> None:
 
     # Update event
     update_data = EventUpdate(title="Updated Event", description="Updated Description")
+    assert created_event.id is not None
     updated_event = await EventService.update_event(
         test_session, created_event.id, update_data
     )
@@ -259,6 +261,7 @@ async def test_update_event_no_changes(test_session: AsyncSession) -> None:
 
     # Update with no data
     update_data = EventUpdate()
+    assert created_event.id is not None
     updated_event = await EventService.update_event(
         test_session, created_event.id, update_data
     )
@@ -288,6 +291,7 @@ async def test_update_event_invalid_datetime(test_session: AsyncSession) -> None
     with pytest.raises(
         ConflictError, match="End datetime must be after start datetime"
     ):
+        assert created_event.id is not None
         await EventService.update_event(test_session, created_event.id, update_data)
 
 
@@ -322,6 +326,7 @@ async def test_update_all_day_event_with_overlap(test_session: AsyncSession) -> 
     with pytest.raises(
         ConflictError, match="All-day event overlaps with existing event"
     ):
+        assert created_event.id is not None
         await EventService.update_event(test_session, created_event.id, update_data)
 
 
@@ -337,10 +342,12 @@ async def test_delete_event(test_session: AsyncSession) -> None:
     created_event = await EventService.create_event(test_session, event_data)
 
     # Delete event
+    assert created_event.id is not None
     await EventService.delete_event(test_session, created_event.id)
 
     # Verify event is deleted
     with pytest.raises(NotFoundError):
+        assert created_event.id is not None
         await EventService.get_event(test_session, created_event.id)
 
 
