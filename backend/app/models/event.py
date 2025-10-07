@@ -75,7 +75,11 @@ class EventUpdate(SQLModel):
     end_datetime: datetime | None = None
     all_day: bool | None = None
     location: str | None = Field(default=None, max_length=500)
-    attendees: list[str] | None = None
+    attendees: list[str] | None = Field(
+        default=None,
+        sa_column=Column(JSON),
+        description="List of email addresses",
+    )
     original_timezone: str | None = Field(default=None, max_length=50)
 
     @field_validator("attendees")
