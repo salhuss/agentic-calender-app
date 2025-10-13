@@ -13,13 +13,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onNewEvent }) => {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="p-6 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">AI Calendar</h2>
-        <p className="text-sm text-gray-600 mt-1">Intelligent scheduling assistant</p>
+      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">AI Calendar</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Intelligent scheduling assistant</p>
       </div>
 
       {/* Quick Actions */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <button
           onClick={() => onNewEvent()}
           className="w-full btn-primary flex items-center justify-center space-x-2"
@@ -32,7 +32,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNewEvent }) => {
       </div>
 
       {/* Search */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <SearchBox
           value={searchQuery}
           onChange={setSearchQuery}
@@ -41,19 +41,19 @@ const Sidebar: React.FC<SidebarProps> = ({ onNewEvent }) => {
       </div>
 
       {/* Mini Calendar */}
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="text-sm font-medium text-gray-900 mb-3">Calendar</h3>
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Calendar</h3>
         <MiniCalendar onDateClick={(date) => onNewEvent(date)} />
       </div>
 
       {/* AI Assistant */}
       <div className="p-4 flex-1">
-        <h3 className="text-sm font-medium text-gray-900 mb-3">AI Assistant</h3>
-        <div className="bg-blue-50 rounded-lg p-3">
-          <p className="text-xs text-blue-800">
+        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">AI Assistant</h3>
+        <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-3">
+          <p className="text-xs text-blue-800 dark:text-blue-200">
             Try creating events with natural language:
           </p>
-          <ul className="text-xs text-blue-700 mt-2 space-y-1">
+          <ul className="text-xs text-blue-700 dark:text-blue-300 mt-2 space-y-1">
             <li>• "Meeting with John tomorrow 3pm"</li>
             <li>• "Lunch at Cafe Rio on Friday"</li>
             <li>• "All day conference next week"</li>

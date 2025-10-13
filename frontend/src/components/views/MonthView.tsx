@@ -46,7 +46,7 @@ const MonthView: React.FC<MonthViewProps> = ({
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
       </div>
     );
   }
@@ -54,11 +54,11 @@ const MonthView: React.FC<MonthViewProps> = ({
   return (
     <div className="h-full flex flex-col">
       {/* Day headers */}
-      <div className="grid grid-cols-7 border-b border-gray-200">
+      <div className="grid grid-cols-7 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         {dayNames.map((day) => (
           <div
             key={day}
-            className="py-2 px-2 text-center text-sm font-medium text-gray-500 border-r border-gray-200 last:border-r-0"
+            className="py-2 px-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-r border-gray-200 dark:border-gray-700 last:border-r-0"
           >
             {day}
           </div>
@@ -68,7 +68,7 @@ const MonthView: React.FC<MonthViewProps> = ({
       {/* Calendar grid */}
       <div className="flex-1 grid grid-rows-6">
         {Array.from({ length: 6 }, (_, weekIndex) => (
-          <div key={weekIndex} className="grid grid-cols-7 border-b border-gray-200 last:border-b-0">
+          <div key={weekIndex} className="grid grid-cols-7 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
             {days.slice(weekIndex * 7, (weekIndex + 1) * 7).map((day) => {
               const isCurrentMonth = day.month === currentDate.month;
               const isToday = day.hasSame(today, 'day');
@@ -77,7 +77,7 @@ const MonthView: React.FC<MonthViewProps> = ({
               return (
                 <div
                   key={day.toISODate()}
-                  className="calendar-cell border-r border-gray-200 last:border-r-0 flex flex-col"
+                  className="calendar-cell border-r border-gray-200 dark:border-gray-700 last:border-r-0 flex flex-col"
                   onClick={() => handleDateClick(day)}
                 >
                   {/* Date number */}
@@ -85,10 +85,10 @@ const MonthView: React.FC<MonthViewProps> = ({
                     <span
                       className={`text-sm font-medium ${
                         !isCurrentMonth
-                          ? 'text-gray-400'
+                          ? 'text-gray-400 dark:text-gray-600'
                           : isToday
-                          ? 'bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs'
-                          : 'text-gray-900'
+                          ? 'bg-blue-600 dark:bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs'
+                          : 'text-gray-900 dark:text-gray-100'
                       }`}
                     >
                       {day.day}
@@ -111,7 +111,7 @@ const MonthView: React.FC<MonthViewProps> = ({
                       </div>
                     ))}
                     {events.length > 3 && (
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
                         +{events.length - 3} more
                       </div>
                     )}

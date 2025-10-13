@@ -31,22 +31,22 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({ onDateClick }) => {
       <div className="flex items-center justify-between mb-2">
         <button
           onClick={handlePrevMonth}
-          className="p-1 hover:bg-gray-100 rounded"
+          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
           aria-label="Previous month"
         >
-          <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h4 className="text-sm font-medium text-gray-900">
+        <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">
           {currentMonth.toFormat('MMM yyyy')}
         </h4>
         <button
           onClick={handleNextMonth}
-          className="p-1 hover:bg-gray-100 rounded"
+          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
           aria-label="Next month"
         >
-          <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
@@ -57,7 +57,7 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({ onDateClick }) => {
         {dayNames.map((day) => (
           <div
             key={day}
-            className="h-6 flex items-center justify-center text-xs font-medium text-gray-500"
+            className="h-6 flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-400"
           >
             {day}
           </div>
@@ -74,12 +74,12 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({ onDateClick }) => {
             <button
               key={day.toISODate()}
               onClick={() => handleDateClick(day)}
-              className={`h-8 flex items-center justify-center text-xs rounded hover:bg-gray-100 transition-colors ${
+              className={`h-8 flex items-center justify-center text-xs rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
                 !isCurrentMonth
-                  ? 'text-gray-400'
+                  ? 'text-gray-400 dark:text-gray-600'
                   : isToday
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'text-gray-900'
+                  ? 'bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600'
+                  : 'text-gray-900 dark:text-gray-100'
               }`}
             >
               {day.day}

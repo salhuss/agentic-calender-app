@@ -188,12 +188,12 @@ const EventModal: React.FC<EventModalProps> = ({ event, defaultDate, onClose }) 
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {isEditing ? 'Edit Event' : 'Create Event'}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
             disabled={isLoading}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -204,11 +204,11 @@ const EventModal: React.FC<EventModalProps> = ({ event, defaultDate, onClose }) 
 
         {/* AI Helper */}
         {showAIHelper && !isEditing && (
-          <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <h3 className="text-sm font-medium text-blue-900 mb-2">
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
+            <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
               AI Event Assistant
             </h3>
-            <p className="text-sm text-blue-700 mb-3">
+            <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
               Describe your event in natural language and I'll help fill out the details.
             </p>
             <div className="flex space-x-2">
@@ -233,7 +233,7 @@ const EventModal: React.FC<EventModalProps> = ({ event, defaultDate, onClose }) 
               <button
                 type="button"
                 onClick={() => setShowAIHelper(false)}
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
               >
                 Fill manually
               </button>
@@ -254,7 +254,7 @@ const EventModal: React.FC<EventModalProps> = ({ event, defaultDate, onClose }) 
               disabled={isLoading}
             />
             {errors.title && (
-              <p className="text-sm text-red-600 mt-1">{errors.title.message}</p>
+              <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.title.message}</p>
             )}
           </div>
 
@@ -276,10 +276,10 @@ const EventModal: React.FC<EventModalProps> = ({ event, defaultDate, onClose }) 
             <input
               type="checkbox"
               {...register('allDay')}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
               disabled={isLoading}
             />
-            <label className="ml-2 block text-sm text-gray-900">
+            <label className="ml-2 block text-sm text-gray-900 dark:text-gray-100">
               All day
             </label>
           </div>
@@ -297,7 +297,7 @@ const EventModal: React.FC<EventModalProps> = ({ event, defaultDate, onClose }) 
                 disabled={isLoading}
               />
               {errors.startDate && (
-                <p className="text-sm text-red-600 mt-1">{errors.startDate.message}</p>
+                <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.startDate.message}</p>
               )}
             </div>
             <div>
@@ -311,7 +311,7 @@ const EventModal: React.FC<EventModalProps> = ({ event, defaultDate, onClose }) 
                 disabled={isLoading}
               />
               {errors.endDate && (
-                <p className="text-sm text-red-600 mt-1">{errors.endDate.message}</p>
+                <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.endDate.message}</p>
               )}
             </div>
           </div>
@@ -369,7 +369,7 @@ const EventModal: React.FC<EventModalProps> = ({ event, defaultDate, onClose }) 
               placeholder="Enter email addresses, separated by commas"
               disabled={isLoading}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Separate multiple email addresses with commas
             </p>
           </div>

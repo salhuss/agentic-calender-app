@@ -42,7 +42,7 @@ const WeekView: React.FC<WeekViewProps> = ({
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
       </div>
     );
   }
@@ -50,23 +50,23 @@ const WeekView: React.FC<WeekViewProps> = ({
   return (
     <div className="h-full flex flex-col">
       {/* Day headers */}
-      <div className="grid grid-cols-7 border-b border-gray-200">
+      <div className="grid grid-cols-7 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         {days.map((day) => {
           const isToday = day.hasSame(today, 'day');
 
           return (
             <div
               key={day.toISODate()}
-              className="py-3 px-2 text-center border-r border-gray-200 last:border-r-0"
+              className="py-3 px-2 text-center border-r border-gray-200 dark:border-gray-700 last:border-r-0"
             >
-              <div className="text-sm font-medium text-gray-500">
+              <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                 {day.toFormat('EEE')}
               </div>
               <div
                 className={`text-lg font-semibold mt-1 ${
                   isToday
-                    ? 'bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center mx-auto'
-                    : 'text-gray-900'
+                    ? 'bg-blue-600 dark:bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center mx-auto'
+                    : 'text-gray-900 dark:text-gray-100'
                 }`}
               >
                 {day.day}
@@ -84,7 +84,7 @@ const WeekView: React.FC<WeekViewProps> = ({
           return (
             <div
               key={day.toISODate()}
-              className="calendar-cell border-r border-gray-200 last:border-r-0 flex flex-col"
+              className="calendar-cell border-r border-gray-200 dark:border-gray-700 last:border-r-0 flex flex-col"
               onClick={() => handleDateClick(day)}
             >
               {/* Events */}
