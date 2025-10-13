@@ -58,17 +58,48 @@ class AIService:
             "keywords": [],
         }
 
-        # Time patterns
-        time_patterns = [
-            r"\b(\d{1,2}):(\d{2})\s*(am|pm)?\b",  # 3:30 pm
-            r"\b(\d{1,2})\s*(am|pm)\b",  # 3 pm
-            r"\b(\d{1,2})-(\d{1,2})\s*(am|pm)\b",  # 3-4 pm
-            r"\b(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})\s*(am|pm)?\b",  # 3:30-4:30 pm
+        # Time patterns - FIXED: Now properly structured
+        # IMPORTANT: Check Pattern 2 first (hour:minute) to avoid Pattern 1 matching the minutes
+
+        # Pattern 2: "3:30pm" or "3:30 pm" -> (hour, minute, am_pm)
+        pattern2 = r"\b(\d{1,2}):(\d{2})\s*(am|pm)\b"
+        for match in re.finditer(pattern2, prompt, re.IGNORECASE):
+            entities["times"].append(
+                {
+                    "type": "single",
+                    "hour": match.group(1),
+                    "minute": match.group(2),
+                    "am_pm": match.group(3),
+                    "raw": match.group(0),
+                }
+            )
+
+        # Pattern 1: "3pm" or "3 pm" -> (hour, am_pm)
+        # Collect positions of already-matched times to avoid duplicates
+        matched_positions = [
+            (prompt.find(t["raw"]), prompt.find(t["raw"]) + len(t["raw"]))
+            for t in entities["times"]
         ]
 
-        for pattern in time_patterns:
-            matches = re.findall(pattern, prompt, re.IGNORECASE)
-            entities["times"].extend(matches)
+        pattern1 = r"\b(\d{1,2})\s*(am|pm)\b"
+        for match in re.finditer(pattern1, prompt, re.IGNORECASE):
+            # Skip if this overlaps with an already-captured time
+            match_start, match_end = match.start(), match.end()
+            overlaps = any(
+                (match_start >= start and match_start < end)
+                or (match_end > start and match_end <= end)
+                for start, end in matched_positions
+            )
+            if not overlaps:
+                entities["times"].append(
+                    {
+                        "type": "single",
+                        "hour": match.group(1),
+                        "minute": "0",
+                        "am_pm": match.group(2),
+                        "raw": match.group(0),
+                    }
+                )
 
         # Date patterns
         date_patterns = [
@@ -99,11 +130,12 @@ class AIService:
             matches = re.findall(pattern, prompt, re.IGNORECASE)
             entities["locations"].extend([match.strip() for match in matches])
 
-        # People patterns (words after 'with')
-        people_pattern = r"\bwith\s+([A-Za-z\s,]+?)(?:\s+at|\s+in|\s+on|\s+from|$)"
+        # People patterns (words after 'with') - FIXED: More precise boundaries
+        people_pattern = r"\bwith\s+([A-Za-z\s,]+?)(?:\s+at\s+|\s+in\s+|\s+on\s+|\s+from\s+|\s+tomorrow\b|\s+today\b|\s+next\s+|\s+\d{1,2}(?:am|pm|:)|$)"
         matches = re.findall(people_pattern, prompt, re.IGNORECASE)
         for match in matches:
-            people = [person.strip() for person in match.split(",")]
+            # Clean up and split by commas
+            people = [person.strip() for person in match.split(",") if person.strip()]
             entities["people"].extend(people)
 
         # Keywords for event type
@@ -165,19 +197,34 @@ class AIService:
 
     @staticmethod
     def _extract_location(prompt: str) -> str | None:
-        """Extract location from prompt."""
+        """Extract location from prompt - FIXED: Better boundaries."""
+        # Pattern: "at <location>" but stop before time/date indicators
         location_patterns = [
-            r"\bat\s+([^,\n]+?)(?:\s+with|\s+on|\s+from|$)",
-            r"\bin\s+([^,\n]+?)(?:\s+with|\s+on|\s+from|$)",
+            r"\bat\s+([A-Za-z][A-Za-z0-9\s]+?)(?:\s+(?:with|on|from|tomorrow|today|next|monday|tuesday|wednesday|thursday|friday|saturday|sunday|\d{1,2}(?:am|pm|:))|\s*$)",
+            r"\bin\s+([A-Za-z][A-Za-z0-9\s]+?)(?:\s+(?:with|on|from|tomorrow|today|next|monday|tuesday|wednesday|thursday|friday|saturday|sunday|\d{1,2}(?:am|pm|:))|\s*$)",
         ]
 
         for pattern in location_patterns:
             match = re.search(pattern, prompt, re.IGNORECASE)
             if match:
                 location = match.group(1).strip()
-                # Clean up common false positives
-                if len(location) > 2 and not re.match(r"\d", location):
-                    return location
+                # Clean up: remove trailing punctuation and common false positives
+                location = re.sub(r"[,.\s]+$", "", location)
+
+                # Validate it's a reasonable location (not just a time or number)
+                if len(location) > 2 and not re.match(r"^[\d\s:]+$", location):
+                    # Don't return if it's just a single word that looks like a day
+                    days = [
+                        "monday",
+                        "tuesday",
+                        "wednesday",
+                        "thursday",
+                        "friday",
+                        "saturday",
+                        "sunday",
+                    ]
+                    if location.lower() not in days:
+                        return location
 
         return None
 
@@ -204,51 +251,67 @@ class AIService:
         if re.search(r"\ball\s+day\b", prompt, re.IGNORECASE):
             all_day = True
 
-        # Extract date
+        # Extract date - IMPROVED: Better day-of-week handling
         base_date = now.date()
-        if "tomorrow" in prompt.lower():
+        prompt_lower = prompt.lower()
+
+        if "tomorrow" in prompt_lower:
             base_date = (now + timedelta(days=1)).date()
-        elif re.search(r"\bnext\s+week\b", prompt.lower()):
+        elif "today" in prompt_lower:
+            base_date = now.date()
+        elif re.search(r"\bnext\s+week\b", prompt_lower):
             base_date = (now + timedelta(weeks=1)).date()
-        elif re.search(r"\bmonday\b", prompt.lower()):
-            days_ahead = 0 - now.weekday()  # Monday is 0
-            if days_ahead <= 0:  # Target day already happened this week
-                days_ahead += 7
-            base_date = (now + timedelta(days=days_ahead)).date()
-        # Add more day patterns as needed
+        else:
+            # Check for specific days of week
+            days_map = {
+                "monday": 0,
+                "tuesday": 1,
+                "wednesday": 2,
+                "thursday": 3,
+                "friday": 4,
+                "saturday": 5,
+                "sunday": 6,
+            }
+            for day_name, day_num in days_map.items():
+                if day_name in prompt_lower:
+                    days_ahead = day_num - now.weekday()
+                    if days_ahead <= 0:  # Target day already happened this week
+                        days_ahead += 7
+                    base_date = (now + timedelta(days=days_ahead)).date()
+                    break
 
-        # Extract time if not all-day
+        # Extract time if not all-day - FIXED: Use new dict structure
         if not all_day and entities["times"]:
-            time_match = entities["times"][0]
-            if len(time_match) >= 2:
-                try:
-                    hour = int(time_match[0])
-                    minute = int(time_match[1]) if time_match[1] else 0
+            time_info = entities["times"][0]  # Get first time mentioned
+            try:
+                hour = int(time_info["hour"])
+                minute = int(time_info["minute"])
+                am_pm = time_info["am_pm"].lower()
 
-                    # Handle AM/PM
-                    if len(time_match) > 2 and time_match[2]:
-                        if time_match[2].lower() == "pm" and hour != 12:
-                            hour += 12
-                        elif time_match[2].lower() == "am" and hour == 12:
-                            hour = 0
+                # Handle AM/PM conversion
+                if am_pm == "pm" and hour != 12:
+                    hour += 12
+                elif am_pm == "am" and hour == 12:
+                    hour = 0
 
-                    start_datetime = datetime.combine(
-                        base_date, datetime.min.time().replace(hour=hour, minute=minute)
-                    )
+                start_datetime = datetime.combine(
+                    base_date, datetime.min.time().replace(hour=hour, minute=minute)
+                )
 
-                    # Default 1-hour duration
-                    end_datetime = start_datetime + timedelta(hours=1)
+                # Default 1-hour duration
+                end_datetime = start_datetime + timedelta(hours=1)
 
-                    # Look for duration or end time in prompt
-                    duration_match = re.search(
-                        r"(\d+)\s*(?:hour|hr)", prompt, re.IGNORECASE
-                    )
-                    if duration_match:
-                        duration_hours = int(duration_match.group(1))
-                        end_datetime = start_datetime + timedelta(hours=duration_hours)
+                # Look for duration or end time in prompt
+                duration_match = re.search(
+                    r"(\d+)\s*(?:hour|hr)s?\b", prompt, re.IGNORECASE
+                )
+                if duration_match:
+                    duration_hours = int(duration_match.group(1))
+                    end_datetime = start_datetime + timedelta(hours=duration_hours)
 
-                except (ValueError, IndexError):
-                    pass
+            except (ValueError, KeyError, IndexError) as e:
+                # If time parsing fails, fall back to all-day
+                all_day = True
 
         # If all-day or no specific time, set all-day event
         if all_day or start_datetime is None:

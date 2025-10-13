@@ -199,11 +199,15 @@ async def test_datetime_extraction_edge_cases() -> None:
     start_dt, end_dt, all_day = AIService._extract_datetime_info(prompt, entities)
     # This tests the Monday weekday calculation
 
-    # Test with malformed time (exception handling lines 250-251)
+    # Test with malformed time (exception handling) - Updated to new dict format
     prompt = "Meeting at invalid:time"
-    entities = {"times": [("invalid", "time")], "dates": []}
+    entities = {
+        "times": [{"hour": "invalid", "minute": "time", "am_pm": "pm"}],
+        "dates": [],
+    }
     start_dt, end_dt, all_day = AIService._extract_datetime_info(prompt, entities)
-    # Should handle the exception gracefully
+    # Should handle the exception gracefully and fall back to all-day
+    assert all_day is True
 
 
 @pytest.mark.asyncio
@@ -237,13 +241,15 @@ async def test_datetime_with_duration() -> None:
         duration = end_dt - start_dt
         assert duration.total_seconds() / 3600 == 3  # 3 hours
 
-    # Also test the case where duration parsing works but time is simple
-    # This tests the duration regex pattern but expects all-day fallback
+    # Also test the case where duration parsing works with simple time
     prompt = "Meeting tomorrow at 2pm for 3 hours"
     entities = AIService._extract_entities(prompt)
     start_dt, end_dt, all_day = AIService._extract_datetime_info(prompt, entities)
-    # This should fall back to all-day since "2pm" doesn't parse correctly
-    assert all_day is True
+    # Now that time parsing is fixed, "2pm" should parse correctly
+    assert all_day is False
+    if start_dt and end_dt:
+        duration = end_dt - start_dt
+        assert duration.total_seconds() / 3600 == 3  # 3 hours
 
 
 @pytest.mark.asyncio
