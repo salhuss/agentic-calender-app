@@ -28,6 +28,11 @@ class Settings(BaseSettings):
         "http://frontend:5173",
     ]
 
+    # LLM Configuration
+    LLM_PROVIDER: str = "local"  # Options: local, openai, anthropic
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "gemma2:2b"
+
     @validator("BACKEND_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(cls, v: str | list[str]) -> list[str] | str:
         """Parse CORS origins."""
