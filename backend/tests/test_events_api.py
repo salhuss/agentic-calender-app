@@ -222,3 +222,41 @@ async def test_list_events_empty_database(client: AsyncClient) -> None:
     assert data["total"] == 0
     assert data["pages"] == 1  # This should hit the 'else 1' case on line 43
     assert len(data["events"]) == 0
+
+
+@pytest.mark.asyncio
+async def test_create_event_draft_missing_prompt(client: AsyncClient) -> None:
+    """Test creating an event draft without a prompt."""
+    response = await client.post("/api/v1/events/draft", json={})
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_event_with_invalid_email(client: AsyncClient) -> None:
+    """Test creating an event with invalid attendee email."""
+    event_data = {
+        "title": "Test Event",
+        "start_datetime": "2023-12-01T10:00:00Z",
+        "end_datetime": "2023-12-01T11:00:00Z",
+        "attendees": ["invalid-email"],
+    }
+    response = await client.post("/api/v1/events/", json=event_data)
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_update_event_with_invalid_email(client: AsyncClient) -> None:
+    """Test updating an event with invalid attendee email."""
+    # Create event first
+    event_data = {
+        "title": "Test Event",
+        "start_datetime": "2023-12-01T10:00:00Z",
+        "end_datetime": "2023-12-01T11:00:00Z",
+    }
+    create_response = await client.post("/api/v1/events/", json=event_data)
+    event_id = create_response.json()["id"]
+
+    # Try to update with invalid email
+    update_data = {"attendees": ["not-an-email"]}
+    response = await client.put(f"/api/v1/events/{event_id}", json=update_data)
+    assert response.status_code == 422

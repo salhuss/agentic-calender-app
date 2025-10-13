@@ -7,6 +7,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.errors import ValidationError
 from app.core.database import get_session
 from app.models.event import (
     EventCreate,
@@ -98,7 +99,7 @@ async def create_event_draft(
     """Generate an event draft from natural language prompt."""
     prompt = draft_request.get("prompt", "")
     if not prompt:
-        raise ValueError("Prompt is required")
+        raise ValidationError("Prompt is required")
 
     draft = await AIService.generate_event_draft(prompt)
     return draft
