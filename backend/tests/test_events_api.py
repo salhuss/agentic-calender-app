@@ -69,7 +69,7 @@ async def test_list_events(
     # Create a few events
     for i in range(3):
         event_data = sample_event_data.copy()
-        event_data["title"] = f"Test Event {i+1}"
+        event_data["title"] = f"Test Event {i + 1}"
         await client.post("/api/v1/events/", json=event_data)
 
     # List events

@@ -149,8 +149,7 @@ async def seed_data() -> None:
 
         print("\n🎉 Database seeded successfully!")
         print(
-            f"You can now run the application and see {events_created} "
-            f"sample events."
+            f"You can now run the application and see {events_created} sample events."
         )
 
 
