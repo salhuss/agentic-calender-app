@@ -117,10 +117,12 @@ describe('Date utilities', () => {
     });
 
     it('returns true for event spanning the day', () => {
+      // Create day in UTC to match event times
+      const dayUTC = DateTime.fromISO('2023-12-01', { zone: 'utc' });
       const start = '2023-11-30T22:00:00Z';
       const end = '2023-12-01T02:00:00Z';
-      // Event overlaps with Dec 1st (day variable is 2023-12-01)
-      expect(isEventInDay(start, end, day)).toBe(true);
+      // Event overlaps with Dec 1st UTC
+      expect(isEventInDay(start, end, dayUTC)).toBe(true);
     });
   });
 
